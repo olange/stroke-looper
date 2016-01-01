@@ -4,47 +4,12 @@ var looper = {};
     var lines = [],
         lastLoopStart;
     
-    var findSegmentIndex = function(segmentsData, time){
-        var i = 0;
-        for(; i < segmentsData.length; i++){
-            if(segmentsData[i] > time){
-                return i  ;
-            }
-        }
-        return i;
-    };
-
-    var makeLine = function(){
-        var segments = [], 
-            segmentsData = [],
-            path = new paper.Path(),
-            line = {path: path,
-                    segments: segments,
-                    segmentsData: segmentsData};
-        path.strokeColor = 'black';
-        line.pushSegment = function(segment,data){
-            segments.push(segment);
-            segmentsData.push(data);
-        };
-        line.redraw = function(duration){
-            var segmentIndex = findSegmentIndex(segmentsData, duration);
-            path.removeSegments();
-            path.addSegments(segments.slice(0, segmentIndex));
-        };
-        line.duration = function(){
-            return segmentsData[segmentsData.length-1];
-        };
-        return line;
-    };
-
-
     var draw = function(){
-        var duration = Date.now() - lastLoopStart;
+        var now = Date.now(),
+            duration = now - lastLoopStart;
+        var maxDuration = 0;
         lines.forEach(function(line){
-            line.redraw(duration);
-            if(duration - line.duration() > 500){
-                lastLoopStart = Date.now();
-            }
+            line.redraw(now);
         });
         paper.view.draw();
     };
@@ -52,17 +17,18 @@ var looper = {};
     var init = function(canvasId){
         var canvas = document.getElementById(canvasId);
         paper.setup(canvas);
+        var durations = [50,10,30];
+        var start = [0,20,10];
         for(var j = 0; j < 3; j++){
             var x = Math.random() * 100, y = Math.random() * 100;
-            lines[j] = makeLine();
-            for(var i=0; i< 20; i++){
+            lines[j] = makeLine(j % 2 != 0 ? 0 : 7000);
+            for(var i=0; i< durations[j]; i++){
                 x += (Math.random()-.25)*10;
                 y += (Math.random()-.25)*10;
-                lines[j].pushSegment([x, y], i*20);
+                lines[j].pushSegment([x, y], (start[j]+i)*90);
             };    
         }
 
-        paper.view.draw();
         var render = function(){
             draw();
             requestAnimationFrame(render);
