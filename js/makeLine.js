@@ -6,14 +6,15 @@ var makeLine = function(duration, creationTime){
         times = [],
         path = new paper.Path();
     path.strokeColor = 'black';
+    path.strokeWidth = 2;
     return {
         segments: segments,
         times: times,
         pushSegment: function(segment, time){
             var relativeTime = time - creationTime;
-            segments.push(segment);
             times.push(relativeTime);
             path.addSegment(segment);
+            segments.push(segment);
             if(duration){
                 loopDuration = Math.ceil(relativeTime / duration) * duration;
             }else{

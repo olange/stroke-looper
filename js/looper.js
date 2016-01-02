@@ -2,60 +2,68 @@ var looper = {};
 (function(){
 
     var lines = [],
+        defaultDuration = 5000,
         currentLine;
+
     var draw = function(){
         lines.forEach(function(line){
             line.redraw(Date.now());
         });
         paper.view.draw();
     };
+ 
+    var startStroke = function(e){
+        currentLine = makeLine(defaultDuration, Date.now());
+        currentLine.pushSegment(e.point, Date.now());
+    };
+    
+    var prolongStroke = function(e){
+        currentLine.pushSegment(e.point, Date.now());
+    };
 
-    var installListeners = function(duration){
+    var endStroke = function(e){ 
+        lines.push(currentLine);
+        currentLine = null;
+    };
+
+    var installListeners = function(){
         var p = {};
         paper.install(p);
         var t = new p.Tool();
-        t.onMouseDown = function(e){
-	    // Give the stroke a color
-            currentLine = makeLine(duration, Date.now());
-            var segment = [e.event.clientX, e.event.clientY];
-            currentLine.pushSegment(segment, Date.now());
-            console.log(e.event);
-        };
-        t.onMouseDrag = function(e){
-            var segment = [e.event.clientX, e.event.clientY];
-            currentLine.pushSegment(segment, Date.now());
-            paper.view.draw();
-        };
-        t.onMouseUp = function(e){ 
-            lines.push(currentLine);
-            currentLine = null;
-        };
+        //t.minDistance = 10;
+        t.onMouseDown = startStroke;
+        t.onMouseDrag = prolongStroke;
+        t.onMouseUp = endStroke ;
     };
 
-    var init = function(canvasId){
-        var canvas = document.getElementById(canvasId);
-        paper.setup(canvas);
+    var someRandomLines = function(number){
         var durations = [50,10,30];
         var start = [0,20,10];
         var now = Date.now();
-        for(var j = 0; j < 3; j++){
+        for(var j = 0; j < number; j++){
             var x = Math.random() * 100, y = Math.random() * 100;
-            lines[j] = makeLine(j % 2 != 0 ? 0 : 3000);
+            lines[j] = makeLine(j % 2 != 0 ? 0 : defaultDuration);
             for(var i=0; i< durations[j]; i++){
                 x += (Math.random()-.25)*10;
                 y += (Math.random()-.25)*10;
                 lines[j].pushSegment([x, y], now + (start[j]+i)*90);
             };    
         }
+    };
 
+    var init = function(canvasId){
+        var canvas = document.getElementById(canvasId);
+        paper.setup(canvas);
+//        someRandomLines(2);
         var render = function(){
             draw();
             requestAnimationFrame(render);
         };
         render();
-        installListeners (3000);
+        installListeners();
 
     };
+
     looper.lines = lines;
     looper.init = init;
 })();
