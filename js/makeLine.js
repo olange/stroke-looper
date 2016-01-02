@@ -1,22 +1,26 @@
-var makeLine = function(duration){
-    var lastLoopStart,
+var makeLine = function(duration, creationTime){
+    creationTime = creationTime || Date.now();
+    var lastLoopStart = creationTime,
         loopDuration,
         segments = [], 
         times = [],
         path = new paper.Path();
     path.strokeColor = 'black';
     return {
+        segments: segments,
+        times: times,
         pushSegment: function(segment, time){
+            var relativeTime = time - creationTime;
             segments.push(segment);
-            times.push(time);
+            times.push(relativeTime);
+            path.addSegment(segment);
             if(duration){
-                loopDuration = Math.ceil(time / duration) * duration;
+                loopDuration = Math.ceil(relativeTime / duration) * duration;
             }else{
-                loopDuration = time + 100;
+                loopDuration = relativeTime + 100;
             }
         },
         redraw: function(now){
-            lastLoopStart = lastLoopStart || now;
             var elapsed = now - lastLoopStart,
                 segmentsToShow = segments.filter(function(s, i){
                     return times[i] < elapsed;
