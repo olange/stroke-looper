@@ -1,6 +1,6 @@
-var makeLine = function(duration, creationTime){
-    creationTime = creationTime || Date.now();
-    var lastLoopStart = creationTime,
+var makeLine = function(duration, initialLoopStart){
+    initialLoopStart = initialLoopStart || Date.now();
+    var lastLoopStart = initialLoopStart,
         loopDuration,
         segments = [], 
         times = [],
@@ -11,14 +11,14 @@ var makeLine = function(duration, creationTime){
         segments: segments,
         times: times,
         pushSegment: function(segment, time){
-            var relativeTime = time - creationTime;
+            var relativeTime = time - initialLoopStart;
             times.push(relativeTime);
             path.addSegment(segment);
             segments.push(segment);
             if(duration){
                 loopDuration = Math.ceil(relativeTime / duration) * duration;
             }else{
-                loopDuration = relativeTime + 100;
+                loopDuration = relativeTime;
             }
         },
         redraw: function(now){

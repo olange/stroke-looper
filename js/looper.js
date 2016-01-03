@@ -1,9 +1,33 @@
 var looper = {};
 (function(){
-
     var lines = [],
-        defaultDuration = 5000,
+        defaultDuration,
+        startTime,
         currentLine;
+ 
+    var installListeners = function(){
+        var p = {};
+        paper.install(p);
+        var t = new p.Tool();
+        //t.minDistance = 10;
+        t.onMouseDown = function(e){
+            if(defaultDuration){
+                var now = Date.now();
+                var loopStart = now - ((now - startTime) % defaultDuration);
+                currentLine = makeLine(defaultDuration, loopStart);
+            }else{
+                currentLine = makeLine();
+            }
+        };
+        t.onMouseDrag = function(e){
+            currentLine.pushSegment(e.point, Date.now());
+        };
+        t.onMouseUp = function(e){ 
+            currentLine.pushSegment(e.point, Date.now());
+            lines.push(currentLine);
+            currentLine = null;
+        };
+    };
 
     var draw = function(){
         lines.forEach(function(line){
@@ -11,29 +35,19 @@ var looper = {};
         });
         paper.view.draw();
     };
- 
-    var startStroke = function(e){
-        currentLine = makeLine(defaultDuration, Date.now());
-        currentLine.pushSegment(e.point, Date.now());
-    };
-    
-    var prolongStroke = function(e){
-        currentLine.pushSegment(e.point, Date.now());
-    };
 
-    var endStroke = function(e){ 
-        lines.push(currentLine);
-        currentLine = null;
-    };
-
-    var installListeners = function(){
-        var p = {};
-        paper.install(p);
-        var t = new p.Tool();
-        //t.minDistance = 10;
-        t.onMouseDown = startStroke;
-        t.onMouseDrag = prolongStroke;
-        t.onMouseUp = endStroke ;
+    var init = function(canvasId, theDefaultDuration, theStartTime){
+        startTime = theStartTime || Date.now();
+        defaultDuration = theDefaultDuration;
+        var canvas = document.getElementById(canvasId);
+        paper.setup(canvas);
+//        someRandomLines(2);
+        var render = function(){
+            draw();
+            requestAnimationFrame(render);
+        };
+        render();
+        installListeners();
     };
 
     var someRandomLines = function(number){
@@ -50,21 +64,8 @@ var looper = {};
             };    
         }
     };
-
-    var init = function(canvasId){
-        var canvas = document.getElementById(canvasId);
-        paper.setup(canvas);
-//        someRandomLines(2);
-        var render = function(){
-            draw();
-            requestAnimationFrame(render);
-        };
-        render();
-        installListeners();
-
-    };
-
     looper.lines = lines;
     looper.init = init;
 })();
+
 
