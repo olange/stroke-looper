@@ -7,17 +7,50 @@
 <script type="text/javascript" src="js/looper.js"></script>
 <script type="text/javascript">
   //http://stackoverflow.com/questions/11582512/how-to-get-url-parameters-with-javascript/11582513#11582513
-  function getURLParameter(name) {
-    return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null;
-  }
+  var getURLParameter = function(name) {
+    var regexString = '[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)';
+    var found = (new RegExp(regexString).exec(location.search)||[,""])[1]
+    return decodeURIComponent(found.replace(/\+/g, '%20'))||null;
+  };
 
-  window.onload = function() {
+  var upload = function(){
+    document.getElementById('jsonLoader').click();
+  };
+
+  var handleJson = function(uploadEvent){
+    var reader = new FileReader();
+    reader.onload = function(readerEvent){
+       var content = readerEvent.target.result.substr(37);
+       console.log(atob(content));
+    }
+    reader.readAsDataURL(uploadEvent.target.files[0]);     
+  };
+
+  var run = function(){
+    var uploadLink = document.getElementById("uploadLink");
+    uploadLink.addEventListener("click", upload, false);
+    var jsonLoader = document.getElementById("jsonLoader");
+    jsonLoader.addEventListener('change', handleJson, false);
+
     var durationInSeconds = parseFloat(getURLParameter("duration"));
     looper.init('myCanvas', durationInSeconds * 1000);
-  }
+  };
+
+  document.addEventListener('DOMContentLoaded', run);
+
 </script>
 </head>
 <body>
-	<canvas id="myCanvas" style="border-style:solid;width:1000px;height:300px" ></canvas>
+  <canvas id="myCanvas" style="border-style:solid;width:1000px;height:300px" ></canvas>
+  
+  <div>
+    <a id="downloadLink" download="looper.json">download</a> 
+    <a id="uploadLink">upload</a>
+    <input type="file" id="jsonLoader" name="jsonLoader" style="display:none"/>
+  </div>
+
+<script type="text/javascript">
+//  run(); // for some reason onload calls too early
+</script>
 </body>
 </html>
