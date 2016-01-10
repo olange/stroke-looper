@@ -40,6 +40,7 @@ var looper = {};
     var init = function(canvasId, theDefaultDuration, theStartTime){
         startTime = theStartTime || Date.now();
         defaultDuration = theDefaultDuration;
+        console.log("default duration " + defaultDuration);
         var canvas = document.getElementById(canvasId);
         paper.setup(canvas);
         var render = function(){

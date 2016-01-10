@@ -3,41 +3,47 @@
 <head>
 <!-- <script type="text/javascript" src="js/paper-full.js"></script> -->
 <script type="text/javascript" src="js/paper-core.js"></script>
+<script type="text/javascript" src="js/urlUtils.js"></script>
 <script type="text/javascript" src="js/importExport.js"></script>
 <script type="text/javascript" src="js/makeLine.js"></script>
 <script type="text/javascript" src="js/looper.js"></script>
 <script type="text/javascript">
-  //http://stackoverflow.com/questions/11582512/how-to-get-url-parameters-with-javascript/11582513#11582513
-  var getURLParameter = function(name) {
-    var regexString = '[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)';
-    var found = (new RegExp(regexString).exec(location.search)||[,""])[1]
-    return decodeURIComponent(found.replace(/\+/g, '%20'))||null;
-  };
-
   var run = function(){
 
-    importExport.installUploader("uploadLink", "jsonLoader",
-                                 looper.setData);
-    importExport.installDownloader("downloadLink", looper.getData);
-    var durationInSeconds = parseFloat(getURLParameter("duration"));
+    importExport.installFileUploader("uploadFileLink", looper.setData);
+    importExport.installFileDownloader("downloadFileLink", looper.getData);
+    importExport.installGistLoader("loadGistLink", looper.setData);
+    
+    var urlParams = urlUtils.getUrlParams();
+    var durationInSeconds = parseFloat(urlParams.duration);
     looper.init('myCanvas', durationInSeconds * 1000);
+    if(urlParams.gist){
+      importExport.loadFromGist(urlParams.gist, looper.setData);
+    }
+
   };
 
   document.addEventListener('DOMContentLoaded', run);
 
 </script>
+<style>
+  canvas {border: 3px solid #E0E0E0;
+          width: 1000px;
+          height: 300px;}
+  a {background-color: #E0E0E0; 
+     padding:5px 9px 5px 9px;}
+  a:hover {background-color: #C0C0C0; }
+  a:active {background-color: #A0A0A0; }
+</style>
 </head>
 <body>
-  <canvas id="myCanvas" style="border-style:solid;width:1000px;height:300px" ></canvas>
-  
+  <canvas id="myCanvas" ></canvas>
   <div>
-    <a id="downloadLink" download="looper.jsonp">download</a> 
-    <a id="uploadLink">upload</a>
-    <input type="file" id="jsonLoader" style="display:none"/>
+    <a id="downloadFileLink" download="looper.jsonp">download file</a> 
+    <a id="uploadFileLink">upload file</a>
+    <input type="file" id="uploadFileLinkLoader" style="display:none"/>
+    <a id="saveGistLink">save gist</a>
+    <a id="loadGistLink">load gist</a>
   </div>
-
-<script type="text/javascript">
-//  run(); // for some reason onload calls too early
-</script>
 </body>
 </html>
