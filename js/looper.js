@@ -4,7 +4,7 @@ var looper = {};
         defaultDuration,
         startTime,
         currentLine;
- 
+
     var installListeners = function(){
         var p = {};
         paper.install(p);
@@ -26,6 +26,7 @@ var looper = {};
             currentLine.pushSegment(e.point, Date.now());
             lines.push(currentLine);
             currentLine = null;
+            console.log(e.point);
         };
     };
 
@@ -41,7 +42,6 @@ var looper = {};
         defaultDuration = theDefaultDuration;
         var canvas = document.getElementById(canvasId);
         paper.setup(canvas);
-//        someRandomLines(2);
         var render = function(){
             draw();
             requestAnimationFrame(render);
@@ -49,23 +49,31 @@ var looper = {};
         render();
         installListeners();
     };
-
-    var someRandomLines = function(number){
-        var durations = [50,10,30];
-        var start = [0,20,10];
-        var now = Date.now();
-        for(var j = 0; j < number; j++){
-            var x = Math.random() * 100, y = Math.random() * 100;
-            lines[j] = makeLine(j % 2 != 0 ? 0 : defaultDuration);
-            for(var i=0; i< durations[j]; i++){
-                x += (Math.random()-.25)*10;
-                y += (Math.random()-.25)*10;
-                lines[j].pushSegment([x, y], now + (start[j]+i)*90);
-            };    
-        }
+    
+    var getData = function(){
+        return {lineData: lines.map(function(l){return l.getData();}),
+                duration: defaultDuration};
     };
-    looper.lines = lines;
+
+    var setData = function(data){
+        var now = Date.now();
+        defaultDuration = data.duration;
+        lines.forEach(function(line){line.clear();});
+        lines.length = 0;
+        data.lineData.forEach(function(dt){
+            var line = makeLine(dt.duration, now);
+            dt.segments = dt.segments.map(function(s){
+                return [s[1], s[2]];
+            });
+            line.setData(dt);
+            lines.push(line);
+        });
+    };
+
     looper.init = init;
+    looper.getData = getData;
+    looper.setData = setData;
+    looper.lines = lines;
 })();
 
 

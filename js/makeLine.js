@@ -1,36 +1,45 @@
 var makeLine = function(duration, initialLoopStart){
     initialLoopStart = initialLoopStart || Date.now();
     var lastLoopStart = initialLoopStart,
-        loopDuration,
-        segments = [], 
-        times = [],
-        path = new paper.Path();
+        path = new paper.Path(),
+        data = {loopDuration: 0,
+                segments: [], 
+                times: []};
     path.strokeColor = 'black';
     path.strokeWidth = 2;
     return {
-        segments: segments,
-        times: times,
+        getData: function(){return data;},
         pushSegment: function(segment, time){
             var relativeTime = time - initialLoopStart;
-            times.push(relativeTime);
+            data.times.push(relativeTime);
             path.addSegment(segment);
-            segments.push(segment);
+            data.segments.push(segment);
             if(duration){
-                loopDuration = Math.ceil(relativeTime / duration) * duration;
+                var loopdur = Math.ceil(relativeTime / duration) * duration;
+                data.loopDuration = loopdur;
             }else{
-                loopDuration = relativeTime;
+                data.loopDuration = relativeTime;
             }
         },
         redraw: function(now){
             var elapsed = now - lastLoopStart,
-                segmentsToShow = segments.filter(function(s, i){
-                    return times[i] < elapsed;
+                segmentsToShow = data.segments.filter(function(s, i){
+                    return data.times[i] < elapsed;
                 });
             path.removeSegments();
             path.addSegments(segmentsToShow);
-            if(elapsed - loopDuration > 0){
+            if(elapsed - data.loopDuration > 0){
                 lastLoopStart = now;
             }
+        },
+        clear: function(){
+            data.segments.length=0;
+            path.removeSegments();
+        },
+        setData: function(newdata){
+            data = newdata;
+            path.removeSegments();
+            path.addSegments(data.segments);
         }
     };
 };

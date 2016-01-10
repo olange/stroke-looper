@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-<script type="text/javascript" src="js/paper-full.js"></script>
-<!-- <script type="text/javascript" src="js/paper-core.js"></script> -->
+<!-- <script type="text/javascript" src="js/paper-full.js"></script> -->
+<script type="text/javascript" src="js/paper-core.js"></script>
+<script type="text/javascript" src="js/importExport.js"></script>
 <script type="text/javascript" src="js/makeLine.js"></script>
 <script type="text/javascript" src="js/looper.js"></script>
 <script type="text/javascript">
@@ -13,25 +14,11 @@
     return decodeURIComponent(found.replace(/\+/g, '%20'))||null;
   };
 
-  var upload = function(){
-    document.getElementById('jsonLoader').click();
-  };
-
-  var handleJson = function(uploadEvent){
-    var reader = new FileReader();
-    reader.onload = function(readerEvent){
-       var content = readerEvent.target.result.substr(37);
-       console.log(atob(content));
-    }
-    reader.readAsDataURL(uploadEvent.target.files[0]);     
-  };
-
   var run = function(){
-    var uploadLink = document.getElementById("uploadLink");
-    uploadLink.addEventListener("click", upload, false);
-    var jsonLoader = document.getElementById("jsonLoader");
-    jsonLoader.addEventListener('change', handleJson, false);
 
+    importExport.installUploader("uploadLink", "jsonLoader",
+                                 looper.setData);
+    importExport.installDownloader("downloadLink", looper.getData);
     var durationInSeconds = parseFloat(getURLParameter("duration"));
     looper.init('myCanvas', durationInSeconds * 1000);
   };
@@ -44,9 +31,9 @@
   <canvas id="myCanvas" style="border-style:solid;width:1000px;height:300px" ></canvas>
   
   <div>
-    <a id="downloadLink" download="looper.json">download</a> 
+    <a id="downloadLink" download="looper.jsonp">download</a> 
     <a id="uploadLink">upload</a>
-    <input type="file" id="jsonLoader" name="jsonLoader" style="display:none"/>
+    <input type="file" id="jsonLoader" style="display:none"/>
   </div>
 
 <script type="text/javascript">
