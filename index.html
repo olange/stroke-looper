@@ -4,7 +4,9 @@
 <!-- <script type="text/javascript" src="js/paper-full.js"></script> -->
 <script type="text/javascript" src="js/paper-core.js"></script>
 <script type="text/javascript" src="js/urlUtils.js"></script>
+<script type="text/javascript" src="js/ajax.js"></script>
 <script type="text/javascript" src="js/importExport.js"></script>
+<script type="text/javascript" src="js/gists.js"></script>
 <script type="text/javascript" src="js/makeLine.js"></script>
 <script type="text/javascript" src="js/looper.js"></script>
 <script type="text/javascript">
@@ -12,15 +14,15 @@
 
     importExport.installFileUploader("uploadFileLink", looper.setData);
     importExport.installFileDownloader("downloadFileLink", looper.getData);
-    importExport.installGistLoader("loadGistLink", looper.setData);
-    
+    gists.installGistSaver("saveGistLink", looper.getData);
+    gists.installGistLoader("loadGistLink", looper.setData);
+
     var urlParams = urlUtils.getUrlParams();
     var durationInSeconds = parseFloat(urlParams.duration);
     looper.init('myCanvas', durationInSeconds * 1000);
     if(urlParams.gist){
-      importExport.loadFromGist(urlParams.gist, looper.setData);
+      gists.loadFromGist(urlParams.gist, looper.setData);
     }
-
   };
 
   document.addEventListener('DOMContentLoaded', run);

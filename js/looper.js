@@ -20,10 +20,10 @@ var looper = {};
             }
         };
         t.onMouseDrag = function(e){
-            currentLine.pushSegment(e.point, Date.now());
+            currentLine.pushSegment([e.point.x,e.point.y], Date.now());
         };
         t.onMouseUp = function(e){ 
-            currentLine.pushSegment(e.point, Date.now());
+            currentLine.pushSegment([e.point.x,e.point.y], Date.now());
             lines.push(currentLine);
             currentLine = null;
             console.log(e.point);
@@ -63,9 +63,6 @@ var looper = {};
         lines.length = 0;
         data.lineData.forEach(function(dt){
             var line = makeLine(dt.duration, now);
-            dt.segments = dt.segments.map(function(s){
-                return [s[1], s[2]];
-            });
             line.setData(dt);
             lines.push(line);
         });
