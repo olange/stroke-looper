@@ -1,53 +1,53 @@
 <!DOCTYPE html>
 <html>
-<head>
-<!-- <script type="text/javascript" src="js/paper-full.js"></script> -->
-<script type="text/javascript" src="js/paper-core.js"></script>
-<script type="text/javascript" src="js/urlUtils.js"></script>
-<script type="text/javascript" src="js/ajax.js"></script>
-<script type="text/javascript" src="js/importExport.js"></script>
-<script type="text/javascript" src="js/gists.js"></script>
-<script type="text/javascript" src="js/makeLine.js"></script>
-<script type="text/javascript" src="js/looper.js"></script>
-<script type="text/javascript">
-  var run = function(){
+  <head>
+    <title>stroke looper</title>
+    <!-- <script type="text/javascript" src="js/paper-full.js"></script> -->
+    <script type="text/javascript" src="js/paper-core.js"></script>
+    <script type="text/javascript" src="js/urlUtils.js"></script>
+    <script type="text/javascript" src="js/ajax.js"></script>
+    <script type="text/javascript" src="js/importExport.js"></script>
+    <script type="text/javascript" src="js/gists.js"></script>
+    <script type="text/javascript" src="js/makeLine.js"></script>
+    <script type="text/javascript" src="js/looper.js"></script>
+    <script type="text/javascript">
+     var run = function(){
+         importExport.installFileUploader("uploadFileLink", looper.setData);
+         importExport.installFileDownloader("downloadFileLink", looper.getData);
+         gists.installGistSaver("saveGistLink", looper.getData);
+         gists.installGistLoader("loadGistLink", looper.setData);
 
-    importExport.installFileUploader("uploadFileLink", looper.setData);
-    importExport.installFileDownloader("downloadFileLink", looper.getData);
-    gists.installGistSaver("saveGistLink", looper.getData);
-    gists.installGistLoader("loadGistLink", looper.setData);
+         var urlParams = urlUtils.getUrlParams();
+         var durationInSeconds = parseFloat(urlParams.duration);
+         looper.init('myCanvas', durationInSeconds * 1000);
+         if(urlParams.gist){
+             gists.loadFromGist(urlParams.gist, looper.setData);
+         }
+     };
 
-    var urlParams = urlUtils.getUrlParams();
-    var durationInSeconds = parseFloat(urlParams.duration);
-    looper.init('myCanvas', durationInSeconds * 1000);
-    if(urlParams.gist){
-      gists.loadFromGist(urlParams.gist, looper.setData);
-    }
-  };
+     document.addEventListener('DOMContentLoaded', run);
 
-  document.addEventListener('DOMContentLoaded', run);
-
-</script>
-<style>
-  canvas {border: 3px solid #E0E0E0;
-          width: 1000px;
-          height: 300px;
-          margin-bottom: -1px;
-  }
-  a {background-color: #E0E0E0; 
-     padding:5px 9px 5px 9px;}
-  a:hover {background-color: #C0C0C0; }
-  a:active {background-color: #A0A0A0; }
-</style>
-</head>
-<body>
-  <canvas id="myCanvas" ></canvas>
-  <div>
-    <a id="downloadFileLink" download="looper.jsonp">download file</a> 
-    <a id="uploadFileLink">upload file</a>
-    <input type="file" id="uploadFileLinkLoader" style="display:none"/>
-    <a id="saveGistLink">save gist</a>
-    <a id="loadGistLink">load gist</a>
-  </div>
-</body>
+    </script>
+    <style>
+     canvas {border: 3px solid #E0E0E0;
+         width: 1000px;
+         height: 300px;
+         margin-bottom: -1px;
+     }
+     a {background-color: #E0E0E0; 
+         padding:5px 9px 5px 9px;}
+     a:hover {background-color: #C0C0C0; }
+     a:active {background-color: #A0A0A0; }
+    </style>
+  </head>
+  <body>
+    <canvas id="myCanvas" ></canvas>
+    <div>
+      <a id="downloadFileLink" download="looper.jsonp">download file</a> 
+      <a id="uploadFileLink">upload file</a>
+      <input type="file" id="uploadFileLinkLoader" style="display:none"/>
+      <a id="saveGistLink">save gist</a>
+      <a id="loadGistLink">load gist</a>
+    </div>
+  </body>
 </html>

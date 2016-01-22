@@ -1,0 +1,19 @@
+{
+    "name": "stroke-looper",
+    "version": "0.0.1",
+    "directories": {
+      "test": "tests"
+    },
+    "scripts": {
+        "test": "test"
+    },
+    "devDependencies" : {
+        "webdriverio": "^3.4.0"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/andreaskundig/stroke-looper.git"
+    },
+    "author": "Andreas Kundig (based on an idea by Ivan Gulizia)",
+    "homepage": "https://github.com/andreaskundig/stroke-looper#readme"
+}

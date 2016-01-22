@@ -6,9 +6,7 @@ var looper = {};
         currentLine;
 
     var installListeners = function(){
-        var p = {};
-        paper.install(p);
-        var t = new p.Tool();
+        var t = new Tool();
         //t.minDistance = 10;
         t.onMouseDown = function(e){
             if(defaultDuration){
@@ -43,6 +41,7 @@ var looper = {};
         console.log("default duration " + defaultDuration);
         var canvas = document.getElementById(canvasId);
         paper.setup(canvas);
+        paper.install(window);
         var render = function(){
             draw();
             requestAnimationFrame(render);
