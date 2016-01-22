@@ -23,6 +23,7 @@ webdriverio
     .moveToObject('#myCanvas',20,50)
     .moveToObject('#myCanvas',30,70)
     .buttonUp()
+    .click('#downloadFileLink')
     .then(function(a){console.log('tests ok');},
             function(e){console.error("FAILED: ",e.message);error = e;})
     .end();

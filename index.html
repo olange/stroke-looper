@@ -6,16 +6,15 @@
     <script type="text/javascript" src="js/paper-core.js"></script>
     <script type="text/javascript" src="js/urlUtils.js"></script>
     <script type="text/javascript" src="js/ajax.js"></script>
-    <script type="text/javascript" src="js/importExport.js"></script>
-    <script type="text/javascript" src="js/gists.js"></script>
+    <script type="text/javascript" src="js/io.js"></script>
     <script type="text/javascript" src="js/makeLine.js"></script>
     <script type="text/javascript" src="js/looper.js"></script>
     <script type="text/javascript">
      var run = function(){
-         importExport.installFileUploader("uploadFileLink", looper.setData);
-         importExport.installFileDownloader("downloadFileLink", looper.getData);
-         gists.installGistSaver("saveGistLink", looper.getData);
-         gists.installGistLoader("loadGistLink", looper.setData);
+         io.files.installUploader("uploadFileLink", looper.setData);
+         io.files.installDownloader("downloadFileLink", looper.getData);
+         io.gists.installSaver("saveGistLink", looper.getData);
+         io.gists.installLoader("loadGistLink", looper.setData);
 
          var urlParams = urlUtils.getUrlParams();
          var durationInSeconds = parseFloat(urlParams.duration);
