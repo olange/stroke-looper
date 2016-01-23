@@ -23,7 +23,15 @@ webdriverio
     .moveToObject('#myCanvas',20,50)
     .moveToObject('#myCanvas',30,70)
     .buttonUp()
-    .click('#downloadFileLink')
+    .execute(function(){ return looper.getData();})
+    .then(function(ret){ 
+        var data = ret.value;
+        assert.equal(1, data.lineData.length);
+        var line = data.lineData[0];
+        assert.equal(3, line.segments.length);
+        assert.deepEqual([[20,50],[30,70],[30,70]], line.segments);
+        console.log(line.segments);
+    })
     .then(function(a){console.log('tests ok');},
             function(e){console.error("FAILED: ",e.message);error = e;})
     .end();

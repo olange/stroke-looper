@@ -27,14 +27,16 @@ io.files = {
         var loader = document.getElementById(loaderId);
         loader.addEventListener('change', handleJson, false);
     },
-
+    dataAsUri: function(data){
+        var jsonpData = io.convertToJsonp(data);
+        var dataUriPrefix = 'data:application/javascript;base64,';
+        return dataUriPrefix  + btoa(jsonpData);
+    },
     installDownloader: function(downloadLinkId, getData){
         // <a id="downloadFileLink" download="looper.jsonp">download</a> 
         var downloadLink = document.getElementById(downloadLinkId);
         var download = function(){
-            var jsonpData = io.convertToJsonp(getData());
-            var dataUriPrefix = 'data:application/javascript;base64,';
-            downloadLink.href = dataUriPrefix  + btoa(jsonpData);
+            downloadLink.href = this.dataAsUri(getData());
         }.bind(this);
         downloadLink.addEventListener('click', download, false);
     }
@@ -80,8 +82,10 @@ io.gists = {
     installLoader: function(loadGistLinkId, load){
         var promptGist = function(){
             var id = prompt("gist to load").trim();
-            id = id.startsWith("https") ? id.split('/')[4] : id;
-            this.load(id, load);
+            if(id){
+                id = id.startsWith("https") ? id.split('/')[4] : id;
+                this.load(id, load);
+            }
         }.bind(this);
         var loadLink = document.getElementById(loadGistLinkId);
         loadLink.addEventListener("click", promptGist, false);
