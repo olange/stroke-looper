@@ -7,6 +7,16 @@ var makeLine = function(duration, initialLoopStart){
                 times: []};
     path.strokeColor = 'black';
     path.strokeWidth = 2;
+    var smoothPreviousSegment = function(path, data){
+        var index = path.segments.length - 2;
+        if(index >= 0){
+            var smSeg = path.segments[index];
+            smSeg.smooth();
+            var smDat = data.segments[index];
+            smDat.handleIn = [smSeg.handleIn.x, smSeg.handleIn.y];
+            smDat.handleOut = [smSeg.handleOut.x, smSeg.handleOut.y];
+        }
+    };
     return {
         getData: function(){return data;},
         pushSegment: function(point, time){
@@ -15,14 +25,7 @@ var makeLine = function(duration, initialLoopStart){
             var segment = {point:point};
             path.add(segment);
             data.segments.push(segment);
-            var index = path.segments.length - 2;
-            if(index >= 0){
-                path.segments[index].smooth();
-                var hin = path.segments[index].handleIn;
-                data.segments[index].handleIn = [hin.x, hin.y];
-                var hout = path.segments[index].handleOut;
-                data.segments[index].handleOut = [hout.x, hout.y];
-            }
+            smoothPreviousSegment(path, data);
             if(duration){
                 var loopdur = Math.ceil(relativeTime / duration) * duration;
                 data.loopDuration = loopdur;

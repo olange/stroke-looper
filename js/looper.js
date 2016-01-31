@@ -24,7 +24,6 @@ var looper = {};
             currentLine.pushSegment([e.point.x,e.point.y], Date.now());
             lines.push(currentLine);
             currentLine = null;
-            console.log(e.point);
         };
     };
 
