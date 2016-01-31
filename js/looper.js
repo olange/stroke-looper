@@ -32,7 +32,7 @@ var looper = {};
         lines.forEach(function(line){
             line.redraw(Date.now());
         });
-        paper.view.draw();
+        view.draw();
     };
 
     var init = function(canvasId, theDefaultDuration, theStartTime){

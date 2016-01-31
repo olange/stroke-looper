@@ -1,7 +1,7 @@
 var makeLine = function(duration, initialLoopStart){
     initialLoopStart = initialLoopStart || Date.now();
     var lastLoopStart = initialLoopStart,
-        path = new paper.Path(),
+        path = new Path(),
         data = {loopDuration: 0,
                 segments: [], 
                 times: []};
@@ -12,8 +12,16 @@ var makeLine = function(duration, initialLoopStart){
         pushSegment: function(segment, time){
             var relativeTime = time - initialLoopStart;
             data.times.push(relativeTime);
-            path.addSegment(segment);
+            path.add(segment);
             data.segments.push(segment);
+            var index = path.segments.length - 2;
+            if(index >= 0){
+                console.log(path.segments[index].smooth);
+            }
+            console.log(path.lastSegment);
+            //path.segments[index].smooth();
+            // data.segments[index].handleIn = path.segments[index].handleIn;
+            // data.segments[index].handleOut = path.segments[index].handleOut;
             if(duration){
                 var loopdur = Math.ceil(relativeTime / duration) * duration;
                 data.loopDuration = loopdur;
