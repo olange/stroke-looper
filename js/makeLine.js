@@ -9,19 +9,20 @@ var makeLine = function(duration, initialLoopStart){
     path.strokeWidth = 2;
     return {
         getData: function(){return data;},
-        pushSegment: function(segment, time){
+        pushSegment: function(point, time){
             var relativeTime = time - initialLoopStart;
             data.times.push(relativeTime);
+            var segment = {point:point};
             path.add(segment);
             data.segments.push(segment);
             var index = path.segments.length - 2;
             if(index >= 0){
-                console.log(path.segments[index].smooth);
+                path.segments[index].smooth();
+                var hin = path.segments[index].handleIn;
+                data.segments[index].handleIn = [hin.x, hin.y];
+                var hout = path.segments[index].handleOut;
+                data.segments[index].handleOut = [hout.x, hout.y];
             }
-            console.log(path.lastSegment);
-            //path.segments[index].smooth();
-            // data.segments[index].handleIn = path.segments[index].handleIn;
-            // data.segments[index].handleOut = path.segments[index].handleOut;
             if(duration){
                 var loopdur = Math.ceil(relativeTime / duration) * duration;
                 data.loopDuration = loopdur;
