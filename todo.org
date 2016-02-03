@@ -1,0 +1,19 @@
+
+1    Possibilité d’annuler un trait (undo)
+2    Taille du canvas + grand ou possibilité de choisir la taille
+3    Possibilité d’effacer le canvas sans reload la page
+4    Possibilité de sauvegarder au format .gif
+5    Effacement du trait et possibilité de choisir le delay
+6    Offset du trait parametrable (avant l’exécution du trait ?)
+7    Lissage du trait
+8    Possibilité de choisir de tracer un trait statique ou animé
+
+––– idées qui pourrait être réalisées dans plus tard
+
+9    Possibilité de choisir entre plusieurs tailles fixe de trait
+ou taille du trait dynamique en fonction de la pression du stylet
+ou sinon comme INK SPACE : https://play.google.com/store/apps/details?id=cc.openframeworks.inkSpace&hl=fr
+10    possibilité de sélectionner un trait après l’avoir tracé et de le moduler
+11    choisir la couleur du trait et celle du background
+12    amélioration de l'interface
+13    communication au public et soirées live avec des illustrateurs / conteurs ;))   

@@ -37,8 +37,7 @@ var makeLine = function(duration, initialLoopStart){
             var elapsed = now - lastLoopStart,
                 segmentsToShow = data.segments.filter(function(s, i){
                     var time = data.times[i];
-                    //return elapsed - 500 < time && time < elapsed ;
-                    return time < elapsed ;
+                    return elapsed - 500 < time && time < elapsed ;
                 });
             path.removeSegments();
             path.addSegments(segmentsToShow);
