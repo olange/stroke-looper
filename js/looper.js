@@ -45,7 +45,7 @@ var looper = {};
 
     var installListeners = function(){
         var t = new Tool();
-        //t.minDistance = 10;
+        t.minDistance = 3;
         t.onMouseDown = function(e){
             if(defaultDuration){
                 var now = Date.now();
