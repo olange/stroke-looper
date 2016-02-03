@@ -7,6 +7,7 @@
     <script type="text/javascript" src="js/urlUtils.js"></script>
     <script type="text/javascript" src="js/ajax.js"></script>
     <script type="text/javascript" src="js/io.js"></script>
+    <script type="text/javascript" src="js/actions.js"></script>
     <script type="text/javascript" src="js/makeLine.js"></script>
     <script type="text/javascript" src="js/looper.js"></script>
     <script type="text/javascript">
@@ -22,10 +23,11 @@
          if(urlParams.gist){
              gists.loadFromGist(urlParams.gist, looper.setData);
          }
+         looper.installClear("clear");
+         actions.installUnRedo("undo","redo");
      };
 
      document.addEventListener('DOMContentLoaded', run);
-
     </script>
     <style>
      canvas {border: 3px solid #E0E0E0;
@@ -44,6 +46,9 @@
   <body>
     <canvas id="myCanvas" ></canvas>
     <div>
+      <a id="undo">undo</a>
+      <a id="redo">redo</a>
+      <a id="clear">clear</a>
       <a id="downloadFileLink" download="looper.jsonp">download file</a> 
       <a id="uploadFileLink">upload file</a>
       <input type="file" id="uploadFileLinkLoader" style="display:none"/>

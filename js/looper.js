@@ -5,6 +5,44 @@ var looper = {};
         startTime,
         currentLine;
 
+    var getData = function(){
+        return {lineData: lines.map(function(l){return l.getData();}),
+                duration: defaultDuration};
+    };
+
+    var setData = function(data){
+        var now = Date.now();
+        defaultDuration = data.duration;
+        lines.forEach(function(line){line.clear();});
+        lines.length = 0;
+        data.lineData.forEach(function(dt){
+            var line = makeLine(dt.duration, now);
+            line.setData(dt);
+            lines.push(line);
+        });
+    };
+
+    var clearAction = function(){
+        var oldLines;
+        return {do: function(){ oldLines = lines;
+                                lines = [];
+                                oldLines.forEach( function(line){
+                                    line.undraw(); });},
+                undo: function(){ lines = oldLines ;}};
+    };
+
+    var installClear = function(clearLinkId){
+        var clear = function(){ actions.do(clearAction()); };
+        var clearLink = document.getElementById(clearLinkId);
+        clearLink.addEventListener("click", clear, false);
+    };
+    
+    var addLineAction = function(line){
+        return {do:  function(){ lines.push(line); },
+                undo: function(){ lines.pop();
+                                  line.undraw();}};
+    };
+
     var installListeners = function(){
         var t = new Tool();
         //t.minDistance = 10;
@@ -22,7 +60,7 @@ var looper = {};
         };
         t.onMouseUp = function(e){ 
             currentLine.pushSegment([e.point.x,e.point.y], Date.now());
-            lines.push(currentLine);
+            actions.do(addLineAction(currentLine));
             currentLine = null;
         };
     };
@@ -49,27 +87,11 @@ var looper = {};
         installListeners();
     };
     
-    var getData = function(){
-        return {lineData: lines.map(function(l){return l.getData();}),
-                duration: defaultDuration};
-    };
-
-    var setData = function(data){
-        var now = Date.now();
-        defaultDuration = data.duration;
-        lines.forEach(function(line){line.clear();});
-        lines.length = 0;
-        data.lineData.forEach(function(dt){
-            var line = makeLine(dt.duration, now);
-            line.setData(dt);
-            lines.push(line);
-        });
-    };
-
     looper.init = init;
     looper.getData = getData;
     looper.setData = setData;
     looper.lines = lines;
+    looper.installClear = installClear;
 })();
 
 

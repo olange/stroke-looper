@@ -36,7 +36,9 @@ var makeLine = function(duration, initialLoopStart){
         redraw: function(now){
             var elapsed = now - lastLoopStart,
                 segmentsToShow = data.segments.filter(function(s, i){
-                    return data.times[i] < elapsed;
+                    var time = data.times[i];
+                    //return elapsed - 500 < time && time < elapsed ;
+                    return time < elapsed ;
                 });
             path.removeSegments();
             path.addSegments(segmentsToShow);
@@ -44,8 +46,11 @@ var makeLine = function(duration, initialLoopStart){
                 lastLoopStart = now;
             }
         },
+        undraw: function(){
+            path.removeSegments();
+        },
         clear: function(){
-            data.segments.length=0;
+            data.segments.length = 0;
             path.removeSegments();
         },
         setData: function(newdata){
