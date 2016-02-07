@@ -1,7 +1,6 @@
 var looper = {};
 (function(){
     var state = {lines: [], defaultDuration: 0},
-        startTime, //TODO try to replace this with 0
         currentLine;
 
     var exportData = function(){
@@ -30,14 +29,10 @@ var looper = {};
 
     var importDataAction = function(data){
         var oldState = state;
-        // oldLines = lines,
-        //     oldDefaultDuration = oldDefaultDuration;
         return {do: function(){ importData(data); },
                 undo: function(){
                     clear();
                     state = oldState;
-                    // lines = oldLines;
-                    // defaultDuration = oldDefaultDuration;
                 }};
     };
 
@@ -66,7 +61,7 @@ var looper = {};
         t.onMouseDown = function(e){
             if(state.defaultDuration){
                 var now = Date.now();
-                var loopStart = (now - startTime) % state.defaultDuration;
+                var loopStart = now % state.defaultDuration;
                 var lineStart = now - lineStart;
                 currentLine = makeLine(state.defaultDuration, lineStart);
             }else{
@@ -90,8 +85,7 @@ var looper = {};
         view.draw();
     };
 
-    var init = function(canvasId, theDefaultDuration, theStartTime){
-        startTime = theStartTime || Date.now();
+    var init = function(canvasId, theDefaultDuration){
         state.defaultDuration = theDefaultDuration;
         console.log("default duration " + state.defaultDuration);
         var canvas = document.getElementById(canvasId);
