@@ -12,16 +12,16 @@
     <script type="text/javascript" src="js/looper.js"></script>
     <script type="text/javascript">
      var run = function(){
-         io.files.installUploader("uploadFileLink", looper.setData);
-         io.files.installDownloader("downloadFileLink", looper.getData);
-         io.gists.installSaver("saveGistLink", looper.getData);
-         io.gists.installLoader("loadGistLink", looper.setData);
+         io.files.installUploader("upldFileLink", looper.importData);
+         io.files.installDownloader("dwnldFileLink", looper.exportData);
+         io.gists.installSaver("saveGistLink", looper.exportData);
+         io.gists.installLoader("loadGistLink", looper.importData);
 
          var urlParams = urlUtils.getUrlParams();
          var durationInSeconds = parseFloat(urlParams.duration);
          looper.init('myCanvas', durationInSeconds * 1000);
          if(urlParams.gist){
-             gists.loadFromGist(urlParams.gist, looper.setData);
+             gists.loadFromGist(urlParams.gist, looper.importData);
          }
          looper.installClear("clear");
          actions.installUnRedo("undo","redo");
@@ -49,9 +49,9 @@
       <a id="undo">undo</a>
       <a id="redo">redo</a>
       <a id="clear">clear</a>
-      <a id="downloadFileLink" download="looper.jsonp">download file</a> 
-      <a id="uploadFileLink">upload file</a>
-      <input type="file" id="uploadFileLinkLoader" style="display:none"/>
+      <a id="dwnldFileLink" download="looper.jsonp">download file</a> 
+      <a id="upldFileLink">upload file</a>
+      <input type="file" id="upldFileLinkLoader" style="display:none"/>
       <a id="saveGistLink">save gist</a>
       <a id="loadGistLink">load gist</a>
     </div>

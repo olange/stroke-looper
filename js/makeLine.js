@@ -18,7 +18,7 @@ var makeLine = function(duration, initialLoopStart){
         }
     };
     return {
-        getData: function(){return data;},
+        exportData: function(){return data;},
         pushSegment: function(point, time){
             var relativeTime = time - initialLoopStart;
             data.times.push(relativeTime);
@@ -48,7 +48,7 @@ var makeLine = function(duration, initialLoopStart){
         clear: function(){
             path.removeSegments();
         },
-        setData: function(newdata){
+        importData: function(newdata){
             data = newdata;
             path.removeSegments();
             path.addSegments(data.segments);

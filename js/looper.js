@@ -1,47 +1,50 @@
 var looper = {};
 (function(){
-    var lines = [],
-        defaultDuration,
-        startTime,
+    var state = {lines: [], defaultDuration: 0},
+        startTime, //TODO try to replace this with 0
         currentLine;
 
-    var getData = function(){
-        return {lineData: lines.map(function(l){return l.getData();}),
-                duration: defaultDuration};
+    var exportData = function(){
+        return {
+            lineData: state.lines.map(function(l){
+                return l.exportData();}),
+            duration: state.defaultDuration};
     };
 
     var clear = function(){
-        var oldLines = lines;
-        lines = [];
-        oldLines.forEach(function(line){ line.clear(); });
+        var oldState = state;
+        state = {lines: [], defaultDuration: oldState.defaultDuration};
+        oldState.lines.forEach(function(line){ line.clear(); });
     };
     
-    var setData = function(data){
+    var importData = function(data){
         clear();
         var now = Date.now();
-        defaultDuration = data.duration;
+        state.defaultDuration = data.duration;
         data.lineData.forEach(function(dt){
             var line = makeLine(dt.duration, now);
-            line.setData(dt);
-            lines.push(line);
+            line.importData(dt);
+            state.lines.push(line);
         });
     };
 
-    var setDataAction = function(data){
-        var oldLines = lines,
-            oldDefaultDuration = oldDefaultDuration;
-        return {do: function(){ setData(data); },
+    var importDataAction = function(data){
+        var oldState = state;
+        // oldLines = lines,
+        //     oldDefaultDuration = oldDefaultDuration;
+        return {do: function(){ importData(data); },
                 undo: function(){
                     clear();
-                    lines = oldLines;
-                    defaultDuration = oldDefaultDuration;
+                    state = oldState;
+                    // lines = oldLines;
+                    // defaultDuration = oldDefaultDuration;
                 }};
     };
 
     var clearAction = function(){
-        var oldLines = lines;
+        var oldState = state;
         return {do: function(){ clear(); },
-                undo: function(){ lines = oldLines ;}};
+                undo: function(){ state = oldState ;}};
     };
 
     var installClear = function(clearLinkId){
@@ -51,8 +54,9 @@ var looper = {};
     };
     
     var addLineAction = function(line){
-        return {do:  function(){ lines.push(line); },
-                undo: function(){ lines.pop();
+        //TODO make this work with default duration...
+        return {do:  function(){ state.lines.push(line); },
+                undo: function(){ state.lines.pop();
                                   line.clear();}};
     };
 
@@ -60,10 +64,11 @@ var looper = {};
         var t = new Tool();
         t.minDistance = 3;
         t.onMouseDown = function(e){
-            if(defaultDuration){
+            if(state.defaultDuration){
                 var now = Date.now();
-                var loopStart = now - ((now - startTime) % defaultDuration);
-                currentLine = makeLine(defaultDuration, loopStart);
+                var loopStart = (now - startTime) % state.defaultDuration;
+                var lineStart = now - lineStart;
+                currentLine = makeLine(state.defaultDuration, lineStart);
             }else{
                 currentLine = makeLine();
             }
@@ -79,7 +84,7 @@ var looper = {};
     };
 
     var draw = function(){
-        lines.forEach(function(line){
+        state.lines.forEach(function(line){
             line.redraw(Date.now());
         });
         view.draw();
@@ -87,8 +92,8 @@ var looper = {};
 
     var init = function(canvasId, theDefaultDuration, theStartTime){
         startTime = theStartTime || Date.now();
-        defaultDuration = theDefaultDuration;
-        console.log("default duration " + defaultDuration);
+        state.defaultDuration = theDefaultDuration;
+        console.log("default duration " + state.defaultDuration);
         var canvas = document.getElementById(canvasId);
         paper.setup(canvas);
         paper.install(window);
@@ -101,9 +106,8 @@ var looper = {};
     };
     
     looper.init = init;
-    looper.getData = getData;
-    looper.setData = function(d){ actions.do(setDataAction(d)); };
-    looper.lines = lines;
+    looper.exportData = exportData;
+    looper.importData = function(d){ actions.do(importDataAction(d)); };
     looper.installClear = installClear;
 })();
 

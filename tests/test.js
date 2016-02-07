@@ -23,7 +23,7 @@ webdriverio
     .moveToObject('#myCanvas',20,50)
     .moveToObject('#myCanvas',30,70)
     .buttonUp()
-    .execute(function(){ return looper.getData();})
+    .execute(function(){ return looper.exportData();})
     .then(function(ret){ 
         var data = ret.value;
         assert.equal(1, data.lineData.length);
