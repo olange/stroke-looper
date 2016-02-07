@@ -10,11 +10,16 @@ var looper = {};
                 duration: defaultDuration};
     };
 
+    var clear = function(){
+        var oldLines = lines;
+        lines = [];
+        oldLines.forEach(function(line){ line.clear(); });
+    };
+    
     var setData = function(data){
+        clear();
         var now = Date.now();
         defaultDuration = data.duration;
-        lines.forEach(function(line){line.clear();});
-        lines.length = 0;
         data.lineData.forEach(function(dt){
             var line = makeLine(dt.duration, now);
             line.setData(dt);
@@ -22,12 +27,20 @@ var looper = {};
         });
     };
 
+    var setDataAction = function(data){
+        var oldLines = lines,
+            oldDefaultDuration = oldDefaultDuration;
+        return {do: function(){ setData(data); },
+                undo: function(){
+                    clear();
+                    lines = oldLines;
+                    defaultDuration = oldDefaultDuration;
+                }};
+    };
+
     var clearAction = function(){
-        var oldLines;
-        return {do: function(){ oldLines = lines;
-                                lines = [];
-                                oldLines.forEach( function(line){
-                                    line.undraw(); });},
+        var oldLines = lines;
+        return {do: function(){ clear(); },
                 undo: function(){ lines = oldLines ;}};
     };
 
@@ -40,7 +53,7 @@ var looper = {};
     var addLineAction = function(line){
         return {do:  function(){ lines.push(line); },
                 undo: function(){ lines.pop();
-                                  line.undraw();}};
+                                  line.clear();}};
     };
 
     var installListeners = function(){
@@ -89,7 +102,7 @@ var looper = {};
     
     looper.init = init;
     looper.getData = getData;
-    looper.setData = setData;
+    looper.setData = function(d){ actions.do(setDataAction(d)); };
     looper.lines = lines;
     looper.installClear = installClear;
 })();

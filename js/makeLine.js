@@ -45,11 +45,7 @@ var makeLine = function(duration, initialLoopStart){
                 lastLoopStart = now;
             }
         },
-        undraw: function(){
-            path.removeSegments();
-        },
         clear: function(){
-            data.segments.length = 0;
             path.removeSegments();
         },
         setData: function(newdata){
