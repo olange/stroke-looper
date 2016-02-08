@@ -57,9 +57,7 @@ var looper = {};
         t.minDistance = 3;
         t.onMouseDown = function(e){
             if(state.defaultDuration){
-                var now = Date.now();
-                var lineStart = now - (now % state.defaultDuration);
-                currentLine = makeLine(state.defaultDuration, lineStart);
+                currentLine = makeLine(state.defaultDuration, Date.now());
             }else{
                 currentLine = makeLine();
             }
