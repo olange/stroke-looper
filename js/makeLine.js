@@ -18,18 +18,17 @@ var makeLine = function(duration, start){
     };
     return {
         exportData: function(){return data;},
-        pushSegment: function(point, time){
-            var relativeTime = time - data.start;
-            data.times.push(relativeTime);
-            var segment = {point:point};
+        pushSegment: function(point, absoluteNow){
+            var now = absoluteNow - data.start,
+                segment = {point: point};
+            data.times.push(now);
             path.add(segment);
             data.segments.push(segment);
             smoothPreviousSegment(path, data);
             if(duration){
-                var loopdur = Math.ceil(relativeTime / duration) * duration;
-                data.loopDuration = loopdur;
+                data.loopDuration = Math.ceil(now / duration) * duration;
             }else{
-                data.loopDuration = relativeTime;
+                data.loopDuration = now;
             }
         },
         redraw: function(absoluteNow){
