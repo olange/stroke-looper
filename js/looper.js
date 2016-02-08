@@ -63,13 +63,14 @@ var looper = {};
             }else{
                 currentLine = makeLine();
             }
+            actions.do(addLineAction(currentLine));
         };
         t.onMouseDrag = function(e){
             currentLine.pushSegment([e.point.x,e.point.y], Date.now());
         };
         t.onMouseUp = function(e){ 
             currentLine.pushSegment([e.point.x,e.point.y], Date.now());
-            actions.do(addLineAction(currentLine));
+            // actions.do(addLineAction(currentLine));
             currentLine = null;
         };
     };
