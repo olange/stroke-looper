@@ -1,8 +1,7 @@
-var makeLine = function(duration, initialLoopStart){
-    initialLoopStart = initialLoopStart || Date.now();
-    var lastLoopStart = initialLoopStart,
-        path = new Path(),
-        data = {loopDuration: 0,
+var makeLine = function(duration, start){
+    var path = new Path(),
+        data = {start: start || Date.now(),
+                loopDuration: 0,
                 segments: [], 
                 times: []};
     path.strokeColor = 'black';
@@ -20,7 +19,7 @@ var makeLine = function(duration, initialLoopStart){
     return {
         exportData: function(){return data;},
         pushSegment: function(point, time){
-            var relativeTime = time - initialLoopStart;
+            var relativeTime = time - data.start;
             data.times.push(relativeTime);
             var segment = {point:point};
             path.add(segment);
@@ -33,25 +32,23 @@ var makeLine = function(duration, initialLoopStart){
                 data.loopDuration = relativeTime;
             }
         },
-        redraw: function(now){
-            var elapsed = now - lastLoopStart,
+        redraw: function(absoluteNow){
+            var now = (absoluteNow - data.start) % data.loopDuration,
+                longevity = 500,
                 segmentsToShow = data.segments.filter(function(s, i){
-                    var time = data.times[i];
-                    return elapsed - 500 < time && time < elapsed ;
+                    var birth = data.times[i];
+                    return birth < now  && now < birth + longevity;
                 });
             path.removeSegments();
             path.addSegments(segmentsToShow);
-            if(elapsed - data.loopDuration > 0){
-                lastLoopStart = now;
-            }
         },
         clear: function(){
             path.removeSegments();
         },
         importData: function(newdata){
             data = newdata;
+            data.start = data.start || 0; //for importing old format
             path.removeSegments();
-            path.addSegments(data.segments);
         }
     };
 };

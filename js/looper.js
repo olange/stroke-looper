@@ -30,10 +30,8 @@ var looper = {};
     var importDataAction = function(data){
         var oldState = state;
         return {do: function(){ importData(data); },
-                undo: function(){
-                    clear();
-                    state = oldState;
-                }};
+                undo: function(){ clear();
+                                  state = oldState;}};
     };
 
     var clearAction = function(){
@@ -49,7 +47,6 @@ var looper = {};
     };
     
     var addLineAction = function(line){
-        //TODO make this work with default duration...
         return {do:  function(){ state.lines.push(line); },
                 undo: function(){ state.lines.pop();
                                   line.clear();}};
@@ -61,8 +58,7 @@ var looper = {};
         t.onMouseDown = function(e){
             if(state.defaultDuration){
                 var now = Date.now();
-                var loopStart = now % state.defaultDuration;
-                var lineStart = now - lineStart;
+                var lineStart = now - (now % state.defaultDuration);
                 currentLine = makeLine(state.defaultDuration, lineStart);
             }else{
                 currentLine = makeLine();
