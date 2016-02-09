@@ -68,7 +68,6 @@ var looper = {};
             currentLine.pushSegment([e.point.x,e.point.y], Date.now());
         };
         t.onMouseUp = function(e){ 
-            currentLine.pushSegment([e.point.x,e.point.y], Date.now());
             currentLine.initDuration();
             currentLine = null;
         };

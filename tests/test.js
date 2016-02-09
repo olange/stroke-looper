@@ -28,11 +28,10 @@ webdriverio
         var data = ret.value;
         assert.equal(1, data.lineData.length);
         var line = data.lineData[0];
-        assert.equal(3, line.segments.length);
+        assert.equal(2, line.segments.length);
         //console.log(line.segments);
         assert.deepEqual([20,50], line.segments[0].point);
         assert.deepEqual([30,70], line.segments[1].point);
-        assert.deepEqual([30,70], line.segments[2].point);
     })
     .then(function(a){console.log('tests ok');},
             function(e){console.error("FAILED: ",e.message);error = e;})
