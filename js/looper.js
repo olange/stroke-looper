@@ -1,7 +1,8 @@
 var looper = {};
 (function(){
     var state = {lines: [], defaultDuration: 0},
-        currentLine;
+        currentLine,
+        pause;
 
     var exportData = function(){
         return {
@@ -68,12 +69,13 @@ var looper = {};
         };
         t.onMouseUp = function(e){ 
             currentLine.pushSegment([e.point.x,e.point.y], Date.now());
-            // actions.do(addLineAction(currentLine));
+            currentLine.initDuration();
             currentLine = null;
         };
     };
 
     var draw = function(){
+        if(pause){ return; }
         state.lines.forEach(function(line){
             line.redraw(Date.now());
         });
@@ -98,6 +100,7 @@ var looper = {};
     looper.exportData = exportData;
     looper.importData = function(d){ actions.do(importDataAction(d)); };
     looper.installClear = installClear;
+    looper.togglePause = function() { pause = !pause; };
 })();
 
 

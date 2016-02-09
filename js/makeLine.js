@@ -1,11 +1,11 @@
 var makeLine = function(duration, start){
-    var path = new Path(),
+    var drawingPath = new Path({strokeColor: 'black', strokeWidth: 2}),
+        referencePath = new Path({visible: false}),
         data = {start: start || Date.now(),
                 loopDuration: 0,
+                longevity: 500,
                 segments: [], 
                 times: []};
-    path.strokeColor = 'black';
-    path.strokeWidth = 2;
     var smoothPreviousSegment = function(path, data){
         var index = path.segments.length - 2;
         if(index >= 0){
@@ -22,32 +22,37 @@ var makeLine = function(duration, start){
             var now = absoluteNow - data.start,
                 segment = {point: point};
             data.times.push(now);
-            path.add(segment);
+            referencePath.add(segment);
             data.segments.push(segment);
-            smoothPreviousSegment(path, data);
+            smoothPreviousSegment(referencePath, data);
+        },
+        initDuration: function(){
+            var last = data.times[data.times.length-1];
             if(duration){
-                data.loopDuration = Math.ceil(now / duration) * duration;
+                data.loopDuration = Math.ceil(last / duration) * duration;
             }else{
-                data.loopDuration = now;
+                data.loopDuration = last ;
             }
         },
         redraw: function(absoluteNow){
-            var now = (absoluteNow - data.start) % data.loopDuration,
-                longevity = 500,
-                segmentsToShow = data.segments.filter(function(s, i){
+            var now = absoluteNow - data.start;
+            now = data.loopDuration ? now % data.loopDuration : now;
+            var segmentsToShow = data.segments.filter(function(s, i){
                     var birth = data.times[i];
-                    return birth < now  && now < birth + longevity;
+                    return birth < now  && now < birth + data.longevity;
                 });
-            path.removeSegments();
-            path.addSegments(segmentsToShow);
+            drawingPath.removeSegments();
+            drawingPath.addSegments(segmentsToShow);
         },
         clear: function(){
-            path.removeSegments();
+            drawingPath.removeSegments();
         },
         importData: function(newdata){
             data = newdata;
             data.start = data.start || 0; //for importing old format
-            path.removeSegments();
+            drawingPath.removeSegments();
+            referencePath.removeSegments();
+            referencePath.addSegments(data.segments);
         }
     };
 };

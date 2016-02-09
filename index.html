@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta charset="UTF-8"> 
     <title>stroke looper</title>
     <!-- <script type="text/javascript" src="js/paper-full.js"></script> -->
     <script type="text/javascript" src="js/paper-core.js"></script>
@@ -25,6 +26,8 @@
          }
          looper.installClear("clear");
          actions.installUnRedo("undo","redo");
+         var pause = document.getElementById('pause');
+         pause.addEventListener('click', looper.togglePause);  
      };
 
      document.addEventListener('DOMContentLoaded', run);
@@ -49,6 +52,7 @@
       <a id="undo">undo</a>
       <a id="redo">redo</a>
       <a id="clear">clear</a>
+      <a id="pause">pause</a>
       <a id="dwnldFileLink" download="looper.jsonp">download file</a> 
       <a id="upldFileLink">upload file</a>
       <input type="file" id="upldFileLinkLoader" style="display:none"/>
