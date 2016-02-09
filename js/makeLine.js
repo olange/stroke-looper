@@ -26,8 +26,8 @@ var makeLine = function(duration, start){
             data.segments.push(segment);
             smoothPreviousSegment(referencePath, data);
         },
-        initDuration: function(){
-            var last = data.times[data.times.length-1];
+        initDuration: function(absoluteLast){
+            var last = absoluteLast - data.start;
             if(duration){
                 data.loopDuration = Math.ceil(last / duration) * duration;
             }else{
