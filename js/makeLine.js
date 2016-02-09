@@ -36,7 +36,7 @@ var makeLine = function(duration, start){
         },
         redraw: function(absoluteNow){
             var now = absoluteNow - data.start;
-            now = data.loopDuration ? now % data.loopDuration : now;
+            if(data.loopDuration){ now = now % data.loopDuration; }
             var segmentsToShow = data.segments.filter(function(s, i){
                     var birth = data.times[i];
                     return birth < now  && now < birth + data.longevity;
