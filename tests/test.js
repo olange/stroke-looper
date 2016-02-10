@@ -30,8 +30,8 @@ webdriverio
         var line = data.lineData[0];
         assert.equal(2, line.segments.length);
         //console.log(line.segments);
-        assert.deepEqual([20,50], line.segments[0].point);
-        assert.deepEqual([30,70], line.segments[1].point);
+        assert.deepEqual([20,50], line.segments[0]);
+        assert.deepEqual([30,70], line.segments[1]);
     })
     .then(function(a){console.log('tests ok');},
             function(e){console.error("FAILED: ",e.message);error = e;})
