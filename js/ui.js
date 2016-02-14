@@ -47,7 +47,7 @@ var ui = {};
     var pickColor = function(colorPicker){
         removeChildren(colorPicker.modal);
         colorPicker.modal.appendChild(colorPicker.container);
-        colorPicker.modal.display = '';
+        colorPicker.modal.style.display = '';
         return new Promise(function(resolve, reject){
             colorPicker.promise.resolve = resolve;
         });
@@ -64,7 +64,6 @@ var ui = {};
         lineConfig.appendChild(colorPickerButton);
         
         colorPickerButton.addEventListener('click', function(){
-            modal.style.display = '';
             pickColor(colorPicker).then(function(colorCss){
                 console.log('the color: ', colorCss);
             });
