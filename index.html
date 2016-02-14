@@ -11,6 +11,7 @@
     <script type="text/javascript" src="js/actions.js"></script>
     <script type="text/javascript" src="js/makeLine.js"></script>
     <script type="text/javascript" src="js/looper.js"></script>
+    <script type="text/javascript" src="js/ui.js"></script>
     <script type="text/javascript">
      var run = function(){
          io.files.installUploader("upldFileLink", looper.importData);
@@ -27,7 +28,8 @@
          looper.installClear("clear");
          actions.installUnRedo("undo","redo");
          var pause = document.getElementById('pause');
-         pause.addEventListener('click', looper.togglePause);  
+         pause.addEventListener('click', looper.togglePause); 
+         ui.install();
      };
 
      document.addEventListener('DOMContentLoaded', run);
@@ -38,8 +40,8 @@
          width: 1000px;
          height: 600px;
          margin-bottom: -1px;}
-     #tools {display: inline-block; vertical-align: top;}
-     #tools > div {
+     #line-config {display: inline-block; vertical-align: top;}
+     #line-config > div {
          width:30px; 
          height: 30px; 
          margin-right: -5px;
@@ -54,8 +56,7 @@
     </style>
   </head>
   <body>
-    <div id="tools">
-      <div>hi</div>
+    <div id="line-config">
     </div>
     <canvas id="myCanvas" ></canvas>
     <div id="button-row">
