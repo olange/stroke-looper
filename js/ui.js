@@ -1,72 +1,69 @@
 var ui = {};
 (function() {
     var createModal = function(){
-        var modal = document.createElement('div');
-        modal.style.width = '100%';
-        modal.style.height = '100%';
-        // modal.style.backgroundColor = 'rgba(50,50,50,0.3)';
-        modal.style.zIndex = '1';
-        modal.style.display = 'none';
-        modal.style.position = 'fixed';
-        modal.style.top = '0';
-        modal.style.left = '0';
-        document.body.insertBefore(modal, document.body.firstChild);
-        return modal;
+        var div = document.createElement('div');
+        div.style.cssText = "z-index:1; display:none; position:fixed";
+        div.style.cssText += "top:0; left:0; width:100%; height:100%;";
+        document.body.insertBefore(div, document.body.firstChild);
+        return {replaceContent: function(c){
+                    while (div.hasChildNodes()) {
+                        div.removeChild(div.lastChild);
+                    }
+                    div.appendChild(c);
+                },
+                show: function(){ div.style.display=''; },
+                hide: function(){ div.style.display='none'; }
+               };
     };
 
-    var removeChildren = function(div){
-        while (div.hasChildNodes()) {
-            div.removeChild(div.lastChild);
-        }
-    };
-
-    var createColorPicker = function (modal, colors){
+    var createColorPicker = function (modal, handleColor, colors){
+        var button = document.createElement('div');
+        var picker = {button: button, color: colors[0]};
+        button.style.backgroundColor = picker.color;
+        
         var container = document.createElement('div');
-        // container.style.left = x + 'px';
-        // container.style.top = y + 'px';
-        var colorPicker = {modal: modal, 
-                           container: container,
-                           promise: {resolve: console.log.bind(console)}};
+        container.style.cssText = 'background-color:#E0E0E0;';
+        container.style.cssText += 'padding:2px; position: relative';
+        var promise = false;
+        var cssStyle = "display:inline-block; margin:2px;";
+        cssStyle += "width:20px; height:20px";
         colors.forEach(function(colorCss){
             var color = document.createElement('div');
+            color.style.cssText = cssStyle;
             color.style.backgroundColor = colorCss;
-            color.style.width = '30px';
-            color.style.height = '30px';
-            color.style.display = 'inline-block';
             color.addEventListener('click', function(){
-                if(colorPicker.promise){
-                    colorPicker.promise.resolve(colorCss);
+                if(handleColor){
+                    handleColor(colorCss);
+                    button.style.backgroundColor = colorCss;
+                    picker.color = colorCss;
                 }
-                modal.style.display = 'none';
+                modal.hide();
             });
             container.appendChild(color);
         });
-        return colorPicker;
+
+        
+        var pickColor = function(){
+            modal.replaceContent(container);
+            var rect = button.getBoundingClientRect();
+            console.log(rect);
+            container.style.left = rect.right + 'px';
+            container.style.top = rect.top + 'px';
+            modal.show();
+        };
+        
+        button.addEventListener('click', pickColor);
+
+        
+        return picker;
     };
 
-    var pickColor = function(colorPicker){
-        removeChildren(colorPicker.modal);
-        colorPicker.modal.appendChild(colorPicker.container);
-        colorPicker.modal.style.display = '';
-        return new Promise(function(resolve, reject){
-            colorPicker.promise.resolve = resolve;
-        });
-    };
-    
-    ui.install= function(){
+    ui.install = function(opts){
         var modal = createModal();
-        var colorPicker = createColorPicker(modal, ['red','green','blue']);
-
-        var colorPickerButton = document.createElement('div');
-        colorPickerButton.innerHTML = 'col';
-        
+        ui.colorPicker = createColorPicker(
+            modal, opts.handleColor,
+            ['black','white','red','green','blue','orange']);
         var lineConfig = document.getElementById('line-config');
-        lineConfig.appendChild(colorPickerButton);
-        
-        colorPickerButton.addEventListener('click', function(){
-            pickColor(colorPicker).then(function(colorCss){
-                console.log('the color: ', colorCss);
-            });
-        });
+        lineConfig.appendChild(ui.colorPicker.button);
     };
 })();

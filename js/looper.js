@@ -2,6 +2,7 @@ var looper = {};
 (function(){
     var state = {lines: [], defaultDuration: 0},
         currentLine,
+        lineColor,
         pause;
 
     var exportData = function(){
@@ -22,7 +23,7 @@ var looper = {};
         var now = Date.now();
         state.defaultDuration = data.duration;
         data.lineData.forEach(function(dt){
-            var line = makeLine(dt.duration, now);
+            var line = makeLine(dt.duration, now, dt.color);
             line.importData(dt);
             state.lines.push(line);
         });
@@ -58,9 +59,11 @@ var looper = {};
         t.minDistance = 3;
         t.onMouseDown = function(e){
             if(state.defaultDuration){
-                currentLine = makeLine(state.defaultDuration, Date.now());
+                currentLine = makeLine(lineColor,
+                                       state.defaultDuration,
+                                       Date.now());
             }else{
-                currentLine = makeLine();
+                currentLine = makeLine(lineColor);
             }
             actions.do(addLineAction(currentLine));
         };
@@ -100,6 +103,7 @@ var looper = {};
     looper.importData = function(d){ actions.do(importDataAction(d)); };
     looper.installClear = installClear;
     looper.togglePause = function() { pause = !pause; };
+    looper.setLineColor = function(c) { lineColor = c;};
 })();
 
 

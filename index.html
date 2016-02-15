@@ -29,7 +29,10 @@
          actions.installUnRedo("undo","redo");
          var pause = document.getElementById('pause');
          pause.addEventListener('click', looper.togglePause); 
-         ui.install();
+         ui.install({handleColor: function(colorCss){
+             looper.setLineColor(colorCss);
+         }});
+         looper.setLineColor(ui.colorPicker.color);
      };
 
      document.addEventListener('DOMContentLoaded', run);
@@ -40,12 +43,15 @@
          width: 1000px;
          height: 600px;
          margin-bottom: -1px;}
-     #line-config {display: inline-block; vertical-align: top;}
-     #line-config > div {
-         width:30px; 
-         height: 30px; 
-         margin-right: -5px;
+     #line-config {
+         display: inline-block;
+         vertical-align: top;
          background-color: #E0E0E0;}
+     #line-config > div {
+         width: 20px;
+         height: 20px;
+         margin: 2px;
+         margin-right: -5px;}
      a {
          background-color: #E0E0E0; 
          padding:5px 9px 5px 9px;
