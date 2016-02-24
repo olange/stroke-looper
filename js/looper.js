@@ -3,6 +3,7 @@ var looper = {};
     var state = {lines: [], defaultDuration: 0},
         currentLine,
         lineColor,
+        strokeWidth,
         pause;
 
     var exportData = function(){
@@ -23,7 +24,7 @@ var looper = {};
         var now = Date.now();
         state.defaultDuration = data.duration;
         data.lineData.forEach(function(dt){
-            var line = makeLine(dt.duration, now, dt.color);
+            var line = makeLine(dt.color, dt.strokeWidth, dt.duration, now);
             line.importData(dt);
             state.lines.push(line);
         });
@@ -60,10 +61,11 @@ var looper = {};
         t.onMouseDown = function(e){
             if(state.defaultDuration){
                 currentLine = makeLine(lineColor,
+                                       strokeWidth,
                                        state.defaultDuration,
                                        Date.now());
             }else{
-                currentLine = makeLine(lineColor);
+                currentLine = makeLine(lineColor, strokeWidth);
             }
             actions.do(addLineAction(currentLine));
         };
@@ -104,6 +106,7 @@ var looper = {};
     looper.installClear = installClear;
     looper.togglePause = function() { pause = !pause; };
     looper.setLineColor = function(c) { lineColor = c;};
+    looper.setStrokeWidth = function(w) { strokeWidth = w;};
 })();
 
 

@@ -1,11 +1,13 @@
-var makeLine = function(color, duration, start){
+var makeLine = function(color, strokeWidth, duration, start){
     var data = {start: start || Date.now(),
                 loopDuration: 0,
                 longevity: 500,
                 color: color || 'black',
+                strokeWidth: strokeWidth || 2,
                 times: []},
         drawingPath = new Path({strokeColor: data.color,
-                                strokeWidth: 2}),
+                                strokeWidth: data.strokeWidth,
+                                strokeCap: 'round'}),
         referencePath = new Path({visible: false});
     return {
         pushSegment: function(point, absoluteNow){

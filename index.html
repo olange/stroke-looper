@@ -30,8 +30,8 @@
          var pause = document.getElementById('pause');
          pause.addEventListener('click', looper.togglePause); 
          ui.install({
-             handleColor: function(colorCss){ looper.setLineColor(colorCss); },
-             handleStrokeWidth: console.log.bind(console)});
+             handleColor: function(c){ looper.setLineColor(c); },
+             handleStrokeWidth: function(w){ looper.setStrokeWidth(w); }});
          looper.setLineColor(ui.colorPicker.color);
      };
 

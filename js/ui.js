@@ -22,31 +22,46 @@ var ui = {};
                                             initialStrokeWidth )
     {
         var size = 25;
+
+        //button
         var button = document.createElement('div');
-        var circle = document.createElement('div');
-        var number = document.createElement('span');
-        button.appendChild(circle);
-        circle.appendChild(number);
         var picker = {button: button, width: initialStrokeWidth};
-        number.innerHTML = picker.width;
+        var circle = document.createElement('div');
         circle.style.cssText = "width:"+size+"px; height:"+size+"px;"
             +"border-radius:50%; background-color: black; color:white;"
             +" text-align:center; vertical-align:middle;"
             +" line-height:"+(size-3)+"px" ;
+        button.appendChild(circle);
+        var number = document.createElement('span');
+        number.innerHTML = picker.width;
         number.style.cssText = "color:white;"
             +" font: 10px arial,sans-serif;";
+        circle.appendChild(number);
         
+        //dialog
         var container = document.createElement('div');
-        container.style.cssText = 'background-color:#E0E0E0; width:116px';
+        container.style.cssText =  'height:' + (size + 5) +'px;';
+        container.style.cssText += ' background-color:#E0E0E0;';
         container.style.cssText += 'padding:3px; position:absolute';
-        var cssStyle = "float:left; margin:2px;";
-        cssStyle += "width:"+size+"px; height:"+size+"px";
+        var slider = document.createElement("input");
+        slider.type = "range";
+        slider.min = 1;
+        slider.max = 600;
+        slider.value = picker.width;
+        slider.addEventListener('input', function(){
+            if(handleStrokeWidth){
+                handleStrokeWidth(slider.value);
+                picker.width = slider.value;
+                number.innerHTML = slider.value;
+            }
+        });
+        container.appendChild(slider);
 
         var pickStrokeWidth = function(){
             modal.replaceContent(container);
-            var rect = button.parentNode.getBoundingClientRect();
+            var rect = button.getBoundingClientRect();
             container.style.left = rect.right + 3 + 'px';
-            container.style.top = rect.top + 'px';
+            container.style.top = rect.top - 5 + 'px';
             modal.show();
         };
         
@@ -56,13 +71,16 @@ var ui = {};
 
     var createColorPicker = function (modal, handleColor, colors){
         var size = 25;
+
+        //button
         var button = document.createElement('div');
+        var picker = {button: button, color: colors[0]};
         var colorPatch = document.createElement('div');
         button.appendChild(colorPatch);
-        var picker = {button: button, color: colors[0]};
         colorPatch.style.cssText = "width:"+size+"px; height:"+size+"px;"
             +" background-color:"+picker.color;
         
+        //dialog
         var container = document.createElement('div');
         container.style.cssText = 'background-color:#E0E0E0; width:116px';
         container.style.cssText += 'padding:3px; position:absolute';
@@ -85,9 +103,9 @@ var ui = {};
 
         var pickColor = function(){
             modal.replaceContent(container);
-            var rect = button.parentNode.getBoundingClientRect();
+            var rect = button.getBoundingClientRect();
             container.style.left = rect.right + 3 + 'px';
-            container.style.top = rect.top + 'px';
+            container.style.top = rect.top - 5 + 'px';
             modal.show();
         };
         
@@ -106,6 +124,6 @@ var ui = {};
 
         ui.strokeWidthPicker = createStrokeWidthPicker(
             modal, opts.handleStrokeWidth, 2);
-        //lineConfig.appendChild(ui.strokeWidthPicker.button);
+        lineConfig.appendChild(ui.strokeWidthPicker.button);
     };
 })();
