@@ -1,0 +1,17 @@
+//somewhat inspired by http://danielstern.ca/range.css/#
+
+input[type=range]::-webkit-slider-thumb {
+  cursor: pointer;
+  margin-top: -8px;
+}
+input[type=range]::-webkit-slider-runnable-track {
+  -webkit-appearance: none;
+  height: 4px;
+  cursor: pointer;
+  background: #303030;
+}
+input[type=range]::-moz-range-track {
+  height: 4px;
+  cursor: pointer;
+  background: #303030;
+}

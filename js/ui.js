@@ -5,7 +5,8 @@ var ui = {};
         div.style.cssText = "z-index:1; display:none; position:fixed";
         div.style.cssText += "top:0; left:0; width:100%; height:100%;";
         document.body.insertBefore(div, document.body.firstChild);
-        var hide = function(){ div.style.display='none'; };
+        var hide = function(e){
+            if(!e || e.target === div){div.style.display='none';} };
         div.addEventListener('click', hide);
         return {replaceContent: function(c){
                     while (div.hasChildNodes()) {
@@ -34,19 +35,16 @@ var ui = {};
         button.appendChild(circle);
         var number = document.createElement('span');
         number.innerHTML = picker.width;
-        number.style.cssText = "color:white;"
-            +" font: 10px arial,sans-serif;";
+        number.style.cssText = "color:white; font: 10px arial,sans-serif;";
         circle.appendChild(number);
         
         //dialog
         var container = document.createElement('div');
-        container.style.cssText =  'height:' + (size + 5) +'px;';
-        container.style.cssText += ' background-color:#E0E0E0;';
-        container.style.cssText += 'padding:3px; position:absolute';
-        var slider = document.createElement("input");
-        slider.type = "range";
-        slider.min = 1;
-        slider.max = 600;
+        container.style.cssText =  'height:' + (size + 5) +'px;'
+            +' background-color:#E0E0E0; padding:3px; position:absolute';
+        container.innerHTML = '<input style="height: 100%;"'
+            +' max="600" min="1" type="range">';
+        var slider = container.firstChild;
         slider.value = picker.width;
         slider.addEventListener('input', function(){
             if(handleStrokeWidth){
@@ -55,7 +53,6 @@ var ui = {};
                 number.innerHTML = slider.value;
             }
         });
-        container.appendChild(slider);
 
         var pickStrokeWidth = function(){
             modal.replaceContent(container);
