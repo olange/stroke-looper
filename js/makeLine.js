@@ -43,7 +43,10 @@ var makeLine = function(color, strokeWidth, duration, start){
         },
         completeCreation: function(absoluteLast){
             initDuration(absoluteLast);
-            simplifyAndSmooth(referencePath);
+            referencePath.smooth({ type: 'catmull-rom'});
+            // unfortunately, this is too expensive. Try a worker?
+            //https://developer.mozilla.org/en-US/docs/Web/API/Worker
+            //simplifyAndSmooth(referencePath);
        },
         redraw: function(absoluteNow){
             var now = absoluteNow - data.start;

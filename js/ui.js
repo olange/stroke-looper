@@ -110,12 +110,24 @@ var ui = {};
         return picker;
     };
 
+    var makeColorRange = function(){
+        var parts = ['00','77', 'aa', 'ff'];
+        var colors = [];
+        parts.forEach(function(p1){
+            parts.forEach(function(p2){
+                parts.forEach(function(p3){
+                    colors.push( '#' + p1 + p2 + p3);
+                });
+            });
+        });
+        return colors;
+    };
+
     ui.install = function(opts){
         var modal = createModal();
         ui.colorPicker = createColorPicker(
             modal, opts.handleColor,
-            ['black','white','silver','gray','red','maroon','yellow','olive',
-             'lime','green','aqua','teal','blue','navy','fuchsia','purple']);
+            makeColorRange());
         var lineConfig = document.getElementById('line-config');
         lineConfig.appendChild(ui.colorPicker.button);
 
