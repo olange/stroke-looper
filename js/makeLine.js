@@ -9,6 +9,29 @@ var makeLine = function(color, strokeWidth, duration, start){
                                 strokeWidth: data.strokeWidth,
                                 strokeCap: 'round'}),
         referencePath = new Path({visible: false});
+
+    var simplifyAndSmooth = function(referencePath){
+        var offsets = referencePath.segments.map(function(s){
+            return referencePath.getOffsetOf(s.point);
+        });
+        referencePath.simplify();
+        var points = offsets.map(function(o){
+            return referencePath.getPointAt(o);
+        }).filter(function(p){return p;});
+        referencePath.removeSegments();
+        referencePath.addSegments(points);
+        referencePath.smooth({ type: 'catmull-rom'});
+    };
+
+    var initDuration = function(absoluteLast){
+        var last = absoluteLast - data.start;
+        if(duration){
+            data.loopDuration = Math.ceil(last / duration) * duration;
+        }else{
+            data.loopDuration = last ;
+        }
+    };
+ 
     return {
         pushSegment: function(point, absoluteNow){
             var now = absoluteNow - data.start,
@@ -18,14 +41,10 @@ var makeLine = function(color, strokeWidth, duration, start){
             var previousIndex = referencePath.segments.length - 2;
             referencePath.segments[Math.max(0, previousIndex)].smooth();
         },
-        initDuration: function(absoluteLast){
-            var last = absoluteLast - data.start;
-            if(duration){
-                data.loopDuration = Math.ceil(last / duration) * duration;
-            }else{
-                data.loopDuration = last ;
-            }
-        },
+        completeCreation: function(absoluteLast){
+            initDuration(absoluteLast);
+            simplifyAndSmooth(referencePath);
+       },
         redraw: function(absoluteNow){
             var now = absoluteNow - data.start;
             if(data.loopDuration){ now = now % data.loopDuration; }

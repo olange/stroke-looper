@@ -73,7 +73,7 @@ var looper = {};
             currentLine.pushSegment([e.point.x,e.point.y], Date.now());
         };
         t.onMouseUp = function(e){ 
-            currentLine.initDuration(Date.now());
+            currentLine.completeCreation(Date.now());
             currentLine = null;
         };
     };
