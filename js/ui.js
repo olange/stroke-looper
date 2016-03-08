@@ -26,24 +26,25 @@ var ui = {};
 
         //button
         var button = document.createElement('div');
+        button.innerHTML = [
+            '<div style="width:'+size+'px; height:'+size+'px;',
+            ' border-radius:50%; background-color: black; color:white;',
+            ' text-align:center; vertical-align:middle;',
+            ' line-height:'+(size-3)+'px">',
+            '  <span style="color:white; font: 10px arial,sans-serif;">',
+            initialStrokeWidth+'</span>',
+            '</div>'
+        ].join('');
+        var number = button.lastChild.lastChild;
         var picker = {button: button, width: initialStrokeWidth};
-        var circle = document.createElement('div');
-        circle.style.cssText = "width:"+size+"px; height:"+size+"px;"
-            +"border-radius:50%; background-color: black; color:white;"
-            +" text-align:center; vertical-align:middle;"
-            +" line-height:"+(size-3)+"px" ;
-        button.appendChild(circle);
-        var number = document.createElement('span');
-        number.innerHTML = picker.width;
-        number.style.cssText = "color:white; font: 10px arial,sans-serif;";
-        circle.appendChild(number);
         
         //dialog
         var container = document.createElement('div');
-        container.style.cssText =  'height:' + (size + 5) +'px;'
-            +' background-color:#E0E0E0; padding:3px; position:absolute';
-        container.innerHTML = '<input style="height: 100%;"'
-            +' max="600" min="1" type="range">';
+        container.style.cssText = [
+            'height:' + (size + 5) + 'px; background-color:#E0E0E0; ',
+            'padding:3px; position:absolute'].join('');
+        container.innerHTML = 
+            '<input style="height: 100%;" max="600" min="1" type="range">';
         var slider = container.firstChild;
         slider.value = picker.width;
         slider.addEventListener('input', function(){
