@@ -43,17 +43,29 @@ var ui = {};
         container.style.cssText = [
             'height:' + (size + 5) + 'px; background-color:#E0E0E0; ',
             'padding:3px; position:absolute'].join('');
-        container.innerHTML = 
-            '<input style="height: 100%;" max="600" min="1" type="range">';
+        container.innerHTML = [
+            '<input style="vertical-align:middle; height:100%"',
+            ' max="600" min="1" type="range">',
+            '<input style="vertical-align:middle; width:30px; margin:1px"',
+            ' type="text">',
+            // '<span style="vertical-align:middle; margin:1px"> &#10008;</span>',
+            // '<span style="vertical-align:middle; margin:1px"> &#10004;</span>'
+        ].join("");
         var slider = container.firstChild;
+        var field = container.children[1];
         slider.value = picker.width;
-        slider.addEventListener('input', function(){
+        var updateWidth = function(event){
+            var value = event.target.value;
             if(handleStrokeWidth){
-                handleStrokeWidth(slider.value);
-                picker.width = slider.value;
-                number.innerHTML = slider.value;
+                handleStrokeWidth(value);
+                picker.width = value;
+                field.value = value;
+                slider.value = value;
+                number.innerHTML = value;
             }
-        });
+        };
+        slider.addEventListener('input', updateWidth);
+        field.addEventListener('input', updateWidth);
 
         var pickStrokeWidth = function(){
             modal.replaceContent(container);
