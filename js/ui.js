@@ -39,33 +39,49 @@ var ui = {};
         var picker = {button: button, width: initialStrokeWidth};
         
         //dialog
+        var style = document.createElement('style');
+        style.innerHTML = [
+            '.width-picker {',
+            '  height:' + (size + 5) + 'px; background-color:#E0E0E0; ',
+            '  padding:3px; position:absolute }',
+            '.width-picker > input, .width-picker > a {',
+            '  vertical-align:middle; margin:0 2px 0 2px;',
+            '  padding: 0 4px 0 4px;}'
+        ].join('');
+        document.getElementsByTagName('head')[0].appendChild(style);
         var container = document.createElement('div');
-        container.style.cssText = [
-            'height:' + (size + 5) + 'px; background-color:#E0E0E0; ',
-            'padding:3px; position:absolute'].join('');
+        container.className = 'width-picker'; 
         container.innerHTML = [
-            '<input style="vertical-align:middle; height:100%"',
-            ' max="600" min="1" type="range">',
-            '<input style="vertical-align:middle; width:30px; margin:1px"',
-            ' type="text">',
-            // '<span style="vertical-align:middle; margin:1px"> &#10008;</span>',
-            // '<span style="vertical-align:middle; margin:1px"> &#10004;</span>'
+            '<input style="height:100%" max="600" min="1" type="range">',
+            '<input style="width:30px" type="text" value="'+picker.width+'">',
+            '<a>&#10008;</a><a>&#10004;</a>'
         ].join("");
         var slider = container.firstChild;
         var field = container.children[1];
+        var cancel = container.children[2];
+        var ok = container.children[3];
         slider.value = picker.width;
         var updateWidth = function(event){
-            var value = event.target.value;
-            if(handleStrokeWidth){
-                handleStrokeWidth(value);
-                picker.width = value;
-                field.value = value;
-                slider.value = value;
-                number.innerHTML = value;
-            }
+            var inputValue = parseFloat(event.target.value);
+            var value = isNaN(inputValue) ? slider.value : inputValue ;
+            field.value = value;
+            slider.value = value;
         };
         slider.addEventListener('input', updateWidth);
         field.addEventListener('input', updateWidth);
+        ok.addEventListener('click', function(){
+            picker.width = slider.value;
+            number.innerHTML = slider.value;
+            if(handleStrokeWidth){
+                handleStrokeWidth(slider.value);
+            }
+            modal.hide();
+        });
+        cancel.addEventListener('click', function(){
+            field.value = picker.width;
+            slider.value = picker.width;
+            modal.hide();
+        });
 
         var pickStrokeWidth = function(){
             modal.replaceContent(container);
