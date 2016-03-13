@@ -46,7 +46,7 @@ var ui = {};
             '  padding:3px; position:absolute }',
             '.width-picker > input, .width-picker > a {',
             '  vertical-align:middle; margin:0 2px 0 2px;',
-            '  padding: 0 4px 0 4px;}'
+            '  padding: 0 4px 0 4px;}',
         ].join('');
         document.getElementsByTagName('head')[0].appendChild(style);
         var container = document.createElement('div');
