@@ -40,20 +40,31 @@ var ui = {};
         
         //dialog
         var style = document.createElement('style');
+        // style.innerHTML = [
+        //     '.width-picker {',
+        //     '  height:' + (size + 5) + 'px; background-color:#E0E0E0; ',
+        //     '  padding:3px; position:absolute }',
+        //     '.width-picker > input, .width-picker > a {',
+        //     '  vertical-align:middle; margin:0 2px 0 2px;',
+        //     '  padding: 0 4px 0 4px;}',
+        // ].join('');
         style.innerHTML = [
             '.width-picker {',
-            '  height:' + (size + 5) + 'px; background-color:#E0E0E0; ',
-            '  padding:3px; position:absolute }',
-            '.width-picker > input, .width-picker > a {',
-            '  vertical-align:middle; margin:0 2px 0 2px;',
-            '  padding: 0 4px 0 4px;}',
+            '  height:'+(size + 10 )+'px; background-color:#E0E0E0; ',
+            '  display: flex; align-items: stretch; position:absolute; }',
+            '.width-picker > input[type=range] { height: 100%;}',
+            '.width-picker > input[type=text] {',
+            ' text-align:right; width: 22px; padding: 5px; margin: 5px;}',
+            '.width-picker > a {',
+            '  vertical-align: middle; line-height: '+(size + 10)+'px;' ,
+            '  padding: 0 5px;}',
         ].join('');
         document.getElementsByTagName('head')[0].appendChild(style);
         var container = document.createElement('div');
         container.className = 'width-picker'; 
         container.innerHTML = [
-            '<input style="height:100%" max="600" min="1" type="range">',
-            '<input style="width:30px" type="text" value="'+picker.width+'">',
+            '<input type="range" max="600" min="1">',
+            '<input type="text" value="'+picker.width+'">',
             '<a>&#10008;</a><a>&#10004;</a>'
         ].join("");
         var slider = container.firstChild;
