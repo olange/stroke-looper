@@ -88,6 +88,8 @@ var ui = {};
             var rect = button.getBoundingClientRect();
             container.style.left = rect.right + 3 + 'px';
             container.style.top = rect.top - 5 + 'px';
+            field.value = picker.width;
+            slider.value = picker.width;
             modal.show();
         };
         
