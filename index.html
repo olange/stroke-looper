@@ -39,14 +39,21 @@
     </script>
     <link rel="stylesheet" type="text/css" href="slider.css" />
     <style>
+     html, body{
+         font-family: Sans-Serif;
+         margin:0;
+         background-color: #E0E0E0;
+     }
+     #container{
+         display: flex;
+         margin: 5px;
+     }
      canvas {
          cursor: crosshair;
-         border: 3px solid #E0E0E0;
+         background-color: white;
          width: 1000px;
-         height: 600px;
-         margin-bottom: -1px;}
+         height: 600px;}
      #line-config {
-         float: left;
          vertical-align: top;
          background-color: #E0E0E0;}
      #line-config > div {
@@ -54,8 +61,12 @@
          width: 25px;
          height: 25px;
          margin: 5px;}
-     a#button-row{
-         padding:5px 9px 5px 9px;
+     #button-row {
+         display: flex;
+     }
+     #button-row > a{
+         padding: 9px 12px;
+         margin: -5px 0px;
      }
      a {
          background-color: #E0E0E0; 
@@ -67,19 +78,23 @@
     </style>
   </head>
   <body>
-    <div id="line-config">
-    </div>
-    <canvas id="myCanvas" ></canvas>
-    <div id="button-row">
-      <a id="undo">undo</a>
-      <a id="redo">redo</a>
-      <a id="clear">clear</a>
-      <a id="pause">pause</a>
-      <a id="dwnldFileLink" download="looper.jsonp">download file</a> 
-      <a id="upldFileLink">upload file</a>
-      <input type="file" id="upldFileLinkLoader" style="display:none"/>
-      <a id="saveGistLink">save gist</a>
-      <a id="loadGistLink">load gist</a>
+    <div id="container">
+      <div id="line-config"></div>
+      <div>
+        <canvas id="myCanvas" ></canvas>
+        <div id="button-row">
+          <a id="undo">
+            undo</a><a id="redo">
+            redo</a><a id="clear">
+            clear</a><a id="pause">
+            pause</a><a id="dwnldFileLink" download="looper.jsonp">
+            download file</a><a id="upldFileLink">
+            upload file</a><a id="saveGistLink">
+            save gist</a><a id="loadGistLink">
+            load gist</a>
+          <input type="file" id="upldFileLinkLoader" style="display:none"/
+        </div>
+      </div>
     </div>
   </body>
 </html>

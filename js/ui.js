@@ -40,14 +40,6 @@ var ui = {};
         
         //dialog
         var style = document.createElement('style');
-        // style.innerHTML = [
-        //     '.width-picker {',
-        //     '  height:' + (size + 5) + 'px; background-color:#E0E0E0; ',
-        //     '  padding:3px; position:absolute }',
-        //     '.width-picker > input, .width-picker > a {',
-        //     '  vertical-align:middle; margin:0 2px 0 2px;',
-        //     '  padding: 0 4px 0 4px;}',
-        // ].join('');
         style.innerHTML = [
             '.width-picker {',
             '  height:'+(size + 10 )+'px; background-color:#E0E0E0; ',
