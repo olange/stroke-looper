@@ -23,8 +23,6 @@ var ui = {};
                                             initialStrokeWidth )
     {
         var size = 25;
-
-        //button
         var button = document.createElement('div');
         button.innerHTML = [
             '<div style="width:'+size+'px; height:'+size+'px;',
@@ -37,33 +35,51 @@ var ui = {};
         ].join('');
         var number = button.lastChild.lastChild;
         var picker = {button: button, width: initialStrokeWidth};
-        
-        //dialog
+        var setValue = function(value){
+            picker.width = value;
+            number.innerHTML = value;
+            if(handleStrokeWidth){
+                handleStrokeWidth(value);
+            }
+        }; 
+        var getValue = function(){
+            return picker.width;
+        };
+
+        var pick = createSlider(button, getValue, setValue, modal);
+        button.addEventListener('click', pick);
+        return picker;
+    };
+
+    var insertSliderCss = function(size){
         var style = document.createElement('style');
         style.innerHTML = [
-            '.width-picker {',
+            '.slider {',
             '  height:'+(size + 10 )+'px; background-color:#E0E0E0; ',
             '  display: flex; align-items: stretch; position:absolute; }',
-            '.width-picker > input[type=range] { height: 100%;}',
-            '.width-picker > input[type=text] {',
+            '.slider > input[type=range] { height: 100%;}',
+            '.slider > input[type=text] {',
             ' text-align:right; width: 22px; padding: 5px; margin: 5px;}',
-            '.width-picker > a {',
+            '.slider > a {',
             '  vertical-align: middle; line-height: '+(size + 10)+'px;' ,
             '  padding: 0 5px;}',
         ].join('');
         document.getElementsByTagName('head')[0].appendChild(style);
+    };
+
+    var createSlider = function(triggerElement, getValue, setValue, modal){
         var container = document.createElement('div');
-        container.className = 'width-picker'; 
+        container.className = 'slider'; 
         container.innerHTML = [
             '<input type="range" max="600" min="1">',
-            '<input type="text" value="'+picker.width+'">',
+            '<input type="text" value="'+getValue()+'">',
             '<a>&#10008;</a><a>&#10004;</a>'
         ].join("");
         var slider = container.firstChild;
         var field = container.children[1];
         var cancel = container.children[2];
         var ok = container.children[3];
-        slider.value = picker.width;
+        slider.value = getValue();
         var updateWidth = function(event){
             var inputValue = parseFloat(event.target.value);
             var value = isNaN(inputValue) ? slider.value : inputValue ;
@@ -73,31 +89,27 @@ var ui = {};
         slider.addEventListener('input', updateWidth);
         field.addEventListener('input', updateWidth);
         ok.addEventListener('click', function(){
-            picker.width = slider.value;
-            number.innerHTML = slider.value;
-            if(handleStrokeWidth){
-                handleStrokeWidth(slider.value);
-            }
+            setValue(slider.value);
             modal.hide();
         });
         cancel.addEventListener('click', function(){
-            field.value = picker.width;
-            slider.value = picker.width;
+            var value = getValue();
+            field.value = value;
+            slider.value = value;
             modal.hide();
         });
 
-        var pickStrokeWidth = function(){
+        var pickValue = function(e){
+            var rect = triggerElement.getBoundingClientRect();
             modal.replaceContent(container);
-            var rect = button.getBoundingClientRect();
             container.style.left = rect.right + 3 + 'px';
-            container.style.top = rect.top - 5 + 'px';
-            field.value = picker.width;
-            slider.value = picker.width;
+            container.style.top = rect.top - 5+ 'px';
+            var value = getValue();
+            field.value = value;
+            slider.value = value;
             modal.show();
         };
-        
-        button.addEventListener('click', pickStrokeWidth);
-        return picker;
+        return pickValue;
     };
 
     var createColorPicker = function (modal, handleColor, colors){
@@ -159,6 +171,7 @@ var ui = {};
 
     ui.install = function(opts){
         var modal = createModal();
+        insertSliderCss(25);
         ui.colorPicker = createColorPicker(
             modal, opts.handleColor,
             makeColorRange());
