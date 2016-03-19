@@ -23,7 +23,7 @@
          var durationInSeconds = parseFloat(urlParams.duration);
          looper.init('myCanvas', durationInSeconds * 1000);
          if(urlParams.gist){
-             gists.loadFromGist(urlParams.gist, looper.importData);
+             io.gists.load(urlParams.gist, looper.importData);
          }
          looper.installClear("clear");
          actions.installUnRedo("undo","redo");
