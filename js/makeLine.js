@@ -1,7 +1,7 @@
-var makeLine = function(color, strokeWidth, duration, start){
+var makeLine = function(color, strokeWidth, longevity, duration, start){
     var data = {start: start || Date.now(),
                 loopDuration: 0,
-                longevity: 500,
+                longevity: longevity || 500,
                 color: color || 'black',
                 strokeWidth: strokeWidth || 2,
                 times: []},
@@ -43,7 +43,9 @@ var makeLine = function(color, strokeWidth, duration, start){
         },
         completeCreation: function(absoluteLast){
             initDuration(absoluteLast);
-            referencePath.smooth({ type: 'catmull-rom'});
+            if(referencePath.segments.length>1){
+                referencePath.smooth({ type: 'catmull-rom'});
+            }
             // unfortunately, this is too expensive. Try a worker?
             //https://developer.mozilla.org/en-US/docs/Web/API/Worker
             //simplifyAndSmooth(referencePath);
@@ -75,7 +77,7 @@ var makeLine = function(color, strokeWidth, duration, start){
             referencePath.segments.forEach(function(s){ s.smooth(); });
             delete newdata.segments;
             data = newdata;
-            data.start = data.start || 0; //for importing old format
+            data.start = data.start;
         }
     };
 };

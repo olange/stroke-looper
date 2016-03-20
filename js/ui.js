@@ -19,34 +19,61 @@ var ui = {};
                };
     };
 
-    var createStrokeWidthPicker = function (modal, handleStrokeWidth, 
-                                            initialStrokeWidth )
+    var createLongevityPicker = function (modal, handleLongevity, 
+                                            initialLongevity, size)
     {
-        var size = 25;
+        var button = document.createElement('div');
+        button.innerHTML = [
+            '<div style="width:'+size+'px; height:'+size+'px;',
+            ' background-color: white; font: 10px arial,sans-serif;',
+            ' text-align: center;',
+            ' line-height:'+(size)+'px">',
+            '  <span style="">',
+            initialLongevity+'</span>s',
+            '</div>'
+        ].join('');
+        window.b = button;
+        var number = button.lastChild.children[0];
+        var longevity =  initialLongevity ;
+        var picker = {button: button, 
+                      get: function(){return longevity ;},
+                      set: function(l){ 
+                          longevity= Math.round(l*10)/10 ;
+                          number.innerHTML = longevity;
+                          if(handleLongevity){
+                              handleLongevity(longevity);
+                          }
+                      }};
+        var pick = createSlider(0.1, 10, false, picker, modal, false);
+        button.addEventListener('click', pick);
+        return picker;
+    };
+
+    var createStrokeWidthPicker = function (modal, handleStrokeWidth, 
+                                            initialStrokeWidth, size)
+    {
         var button = document.createElement('div');
         button.innerHTML = [
             '<div style="width:'+size+'px; height:'+size+'px;',
             ' border-radius:50%; background-color: black; color:white;',
             ' text-align:center; vertical-align:middle;',
             ' line-height:'+(size-3)+'px">',
-            '  <span style="color:white; font: 10px arial,sans-serif;">',
+            '  <span style="font: 10px arial,sans-serif;">',
             initialStrokeWidth+'</span>',
             '</div>'
         ].join('');
         var number = button.lastChild.lastChild;
-        var picker = {button: button, width: initialStrokeWidth};
-        var setValue = function(value){
-            picker.width = value;
-            number.innerHTML = value;
-            if(handleStrokeWidth){
-                handleStrokeWidth(value);
-            }
-        }; 
-        var getValue = function(){
-            return picker.width;
-        };
-
-        var pick = createSlider(button, getValue, setValue, modal);
+        var width = initialStrokeWidth;
+        var picker = {button: button, 
+                      get: function(){return width;},
+                      set: function(w){ 
+                          width=w;
+                          number.innerHTML = w;
+                          if(handleStrokeWidth){
+                              handleStrokeWidth(w);
+                          }
+                      }};
+        var pick = createSlider( 0, 6.5, true, picker, modal, false);
         button.addEventListener('click', pick);
         return picker;
     };
@@ -67,53 +94,72 @@ var ui = {};
         document.getElementsByTagName('head')[0].appendChild(style);
     };
 
-    var createSlider = function(triggerElement, getValue, setValue, modal){
+    var createSlider = function(min, max, loga, picker, modal, confirm){
         var container = document.createElement('div');
         container.className = 'slider'; 
         container.innerHTML = [
-            '<input type="range" max="600" min="1">',
-            '<input type="text" value="'+getValue()+'">',
-            '<a>&#10008;</a><a>&#10004;</a>'
+            '<input type="range" max="'+max+'" min="'+min+'" step="0.1">',
+            '<input type="text" value="'+picker.get()+'">'
         ].join("");
+        if(confirm){
+            container.innerHTML += '<a>&#10008;</a><a>&#10004;</a>';
+            var cancel = container.children[2];
+            var ok = container.children[3];
+        }
         var slider = container.firstChild;
         var field = container.children[1];
-        var cancel = container.children[2];
-        var ok = container.children[3];
-        slider.value = getValue();
-        var updateWidth = function(event){
-            var inputValue = parseFloat(event.target.value);
-            var value = isNaN(inputValue) ? slider.value : inputValue ;
-            field.value = value;
-            slider.value = value;
-        };
-        slider.addEventListener('input', updateWidth);
-        field.addEventListener('input', updateWidth);
-        ok.addEventListener('click', function(){
-            setValue(slider.value);
-            modal.hide();
+        var sliderToField = function(v){ return v;};
+        var fieldToSlider = sliderToField;
+        if(loga){
+            sliderToField = function(logv){
+                return Math.floor(Math.pow(Math.E, logv));
+            };
+            fieldToSlider = Math.log.bind(Math);
+        }
+        slider.value = fieldToSlider(picker.get());
+        field.addEventListener('input', function(event){
+            if(isNaN(event.target.value)){
+                field.value = sliderToField(slider.value);
+            }else{
+                var value = parseFloat(event.target.value);
+                slider.value = fieldToSlider(value);
+            }
+            if(!confirm){
+                picker.set(field.value);
+            }
         });
-        cancel.addEventListener('click', function(){
-            var value = getValue();
-            field.value = value;
-            slider.value = value;
-            modal.hide();
+        slider.addEventListener('input', function(event){
+            var value = parseFloat(event.target.value);
+            field.value = sliderToField(value);
+            if(!confirm){
+                picker.set(field.value);
+            }
         });
+        if(confirm){
+            ok.addEventListener('click', function(){
+                picker.set(field.value);
+                modal.hide();
+            });
+            cancel.addEventListener('click', function(){
+                field.value = picker.get();
+                slider.value = fieldToSlider(field.value);
+                modal.hide();
+            });
+        }
 
         var pickValue = function(e){
-            var rect = triggerElement.getBoundingClientRect();
+            var rect = picker.button.getBoundingClientRect();
             modal.replaceContent(container);
             container.style.left = rect.right + 3 + 'px';
             container.style.top = rect.top - 5+ 'px';
-            var value = getValue();
-            field.value = value;
-            slider.value = value;
+            field.value = picker.get();
+            slider.value = fieldToSlider(field.value);
             modal.show();
         };
         return pickValue;
     };
 
-    var createColorPicker = function (modal, handleColor, colors){
-        var size = 25;
+    var createColorPicker = function (modal, handleColor, colors, size){
 
         //button
         var button = document.createElement('div');
@@ -171,15 +217,19 @@ var ui = {};
 
     ui.install = function(opts){
         var modal = createModal();
-        insertSliderCss(25);
+        var size = 25;
+        insertSliderCss(size);
         ui.colorPicker = createColorPicker(
-            modal, opts.handleColor,
-            makeColorRange());
+            modal, opts.handleColor, makeColorRange(), size);
         var lineConfig = document.getElementById('line-config');
         lineConfig.appendChild(ui.colorPicker.button);
 
         ui.strokeWidthPicker = createStrokeWidthPicker(
-            modal, opts.handleStrokeWidth, 2);
+            modal, opts.handleStrokeWidth, 2, size);
         lineConfig.appendChild(ui.strokeWidthPicker.button);
+
+        ui.longevityPicker = createLongevityPicker(
+            modal, opts.handleLongevity, 0.5, size);
+        lineConfig.appendChild(ui.longevityPicker.button);
     };
 })();

@@ -31,7 +31,8 @@
          pause.addEventListener('click', looper.togglePause); 
          ui.install({
              handleColor: function(c){ looper.setLineColor(c); },
-             handleStrokeWidth: function(w){ looper.setStrokeWidth(w); }});
+             handleStrokeWidth: function(w){ looper.setStrokeWidth(w); },
+             handleLongevity: function(l){ looper.setLongevity(l*500); }});
          looper.setLineColor(ui.colorPicker.color);
      };
 
