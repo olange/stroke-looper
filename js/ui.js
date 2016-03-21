@@ -25,7 +25,7 @@ var ui = {};
         var button = document.createElement('div');
         button.innerHTML = [
             '<div style="width:'+size+'px; height:'+size+'px;',
-            ' background-color: white; font: 10px arial,sans-serif;',
+            ' background-color: white; font: 14px arial,sans-serif;',
             ' text-align: center;',
             ' line-height:'+(size)+'px">',
             '  <span style="">',
@@ -58,7 +58,7 @@ var ui = {};
             ' border-radius:50%; background-color: black; color:white;',
             ' text-align:center; vertical-align:middle;',
             ' line-height:'+(size-3)+'px">',
-            '  <span style="font: 10px arial,sans-serif;">',
+            '  <span style="font: 14px arial,sans-serif;">',
             initialStrokeWidth+'</span>',
             '</div>'
         ].join('');
@@ -76,6 +76,21 @@ var ui = {};
         var pick = createSlider( 0, 6.5, true, picker, modal, false);
         button.addEventListener('click', pick);
         return picker;
+    };
+
+    var insertLineConfigCss = function(size){
+        var style = document.createElement('style');
+        style.innerHTML = [
+            '#line-config {',
+            '  vertical-align: top;',
+            '  background-color: #E0E0E0;}',
+            '#line-config > div {',
+            '  cursor: pointer;',
+            '  width: '+size+'px;',
+            '  height: '+size+'px;',
+            '  margin: 5px;}'
+        ].join('');
+        document.getElementsByTagName('head')[0].appendChild(style);
     };
 
     var insertSliderCss = function(size){
@@ -171,8 +186,9 @@ var ui = {};
         
         //dialog
         var container = document.createElement('div');
-        container.style.cssText = 'background-color:#E0E0E0; width:116px';
-        container.style.cssText += 'padding:3px; position:absolute';
+        var contCss = 'background-color:#E0E0E0; width:'+(16*(size+4))+'px;';
+        contCss += 'padding:3px; position:absolute';
+        container.style.cssText = contCss;
         var cssStyle = "float:left; margin:2px;";
         cssStyle += "width:"+size+"px; height:"+size+"px";
         colors.forEach(function(colorCss){
@@ -217,7 +233,8 @@ var ui = {};
 
     ui.install = function(opts){
         var modal = createModal();
-        var size = 25;
+        var size = 35;
+        insertLineConfigCss(size);
         insertSliderCss(size);
         ui.colorPicker = createColorPicker(
             modal, opts.handleColor, makeColorRange(), size);
