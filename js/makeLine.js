@@ -1,6 +1,6 @@
 var makeLine = function(color, strokeWidth, longevity, duration, start){
     var data = {start: start || Date.now(),
-                loopDuration: 0,
+                lineDuration: 0,
                 longevity: longevity || 500,
                 color: color || 'black',
                 strokeWidth: strokeWidth || 2,
@@ -26,9 +26,11 @@ var makeLine = function(color, strokeWidth, longevity, duration, start){
     var initDuration = function(absoluteLast){
         var last = absoluteLast - data.start;
         if(duration){
-            data.loopDuration = Math.ceil(last / duration) * duration;
+            // lineDuration is the lowest multiple of duration
+            // that is greater than last
+            data.lineDuration = Math.ceil(last / duration) * duration;
         }else{
-            data.loopDuration = last ;
+            data.lineDuration = last ;
         }
     };
  
@@ -52,7 +54,8 @@ var makeLine = function(color, strokeWidth, longevity, duration, start){
        },
         redraw: function(absoluteNow){
             var now = absoluteNow - data.start;
-            if(data.loopDuration){ now = now % data.loopDuration; }
+            // There is no lineDuration while the line is being drawn.
+            if(data.lineDuration){ now = now % data.loopDuration; }
             var segmentsToShow = referencePath.segments.filter(function(s, i){
                 var birth = data.times[i];
                 return birth < now  && now < birth + data.longevity;
