@@ -5,7 +5,9 @@ var looper = {};
         lineColor,
         strokeWidth,
         longevity,
-        pause;
+        lastTime = 0,
+        lastCorrectedTime = 0,
+        speed = 1;
 
     var exportData = function(){
         return {
@@ -82,11 +84,15 @@ var looper = {};
     };
 
     var draw = function(){
-        if(pause){ return; }
+        var now = Date.now(),
+            interval = now - lastTime,
+            correctedNow = lastCorrectedTime + interval * speed ;
         state.lines.forEach(function(line){
-            line.redraw(Date.now());
+            line.redraw(correctedNow);
         });
         view.draw();
+        lastTime = now;
+        lastCorrectedTime = correctedNow;
     };
 
     var init = function(canvasId, theDefaultDuration){
@@ -107,7 +113,7 @@ var looper = {};
     looper.exportData = exportData;
     looper.importData = function(d){ actions.do(importDataAction(d)); };
     looper.installClear = installClear;
-    looper.togglePause = function() { pause = !pause; };
+    looper.togglePause = function() { speed = speed ? 0 : 1; };
     looper.setLineColor = function(c) { lineColor = c;};
     looper.setStrokeWidth = function(w) { strokeWidth = w;};
     looper.setLongevity = function(l) { longevity = l;};
