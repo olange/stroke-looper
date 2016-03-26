@@ -68,17 +68,17 @@ var looper = {};
                                        strokeWidth,
                                        longevity,
                                        state.defaultDuration,
-                                       Date.now());
+                                       lastCorrectedTime);
             }else{
                 currentLine = makeLine(lineColor, strokeWidth, longevity);
             }
             actions.do(addLineAction(currentLine));
         };
         t.onMouseDrag = function(e){
-            currentLine.pushSegment([e.point.x,e.point.y], Date.now());
+            currentLine.pushSegment([e.point.x,e.point.y], lastCorrectedTime);
         };
         t.onMouseUp = function(e){ 
-            currentLine.completeCreation(Date.now());
+            currentLine.completeCreation(lastCorrectedTime);
             currentLine = null;
         };
     };
@@ -87,12 +87,12 @@ var looper = {};
         var now = Date.now(),
             interval = now - lastTime,
             correctedNow = lastCorrectedTime + interval * speed ;
+        lastTime = now;
+        lastCorrectedTime = correctedNow;
         state.lines.forEach(function(line){
             line.redraw(correctedNow);
         });
         view.draw();
-        lastTime = now;
-        lastCorrectedTime = correctedNow;
     };
 
     var init = function(canvasId, theDefaultDuration){
