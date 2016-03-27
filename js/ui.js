@@ -97,7 +97,7 @@ var ui = {};
             '.looper-control-button{',
             'font-size: 18px;',
             'padding: 9px 12px;',
-            'margin: -5px 0px;',
+            // 'margin: -5px 0px;',
             'background-color: #E0E0E0; ',
             'color: black;',
             'text-decoration:none;',
@@ -188,7 +188,7 @@ var ui = {};
         var pickValue = function(e){
             var rect = picker.button.getBoundingClientRect();
             modal.replaceContent(container);
-            container.style.left = rect.right + 3 + 'px';
+            container.style.left = rect.right + 'px';
             container.style.top = rect.top - 5+ 'px';
             field.value = picker.get();
             slider.value = fieldToSlider(field.value);
@@ -233,7 +233,7 @@ var ui = {};
         var pickColor = function(){
             modal.replaceContent(container);
             var rect = button.getBoundingClientRect();
-            container.style.left = rect.right + 3 + 'px';
+            container.style.left = rect.right + 'px';
             container.style.top = rect.top - 5 + 'px';
             modal.show();
         };
@@ -254,6 +254,43 @@ var ui = {};
         });
         return colors;
     };
+
+    var createFileMenu = function(modal, parent, importData, exportData){
+        var fileButton = createLooperButton(parent, "file");
+        var container = document.createElement('div');
+        var contCss = 'position: absolute; display: flex; flex-flow: column';
+        container.style.cssText = contCss;
+
+        var doImport = function(data){importData(data); modal.hide();};
+        var doExport = function(){modal.hide();return exportData(); };
+
+        var uploadFile = createLooperButton(container, "upload file");
+        io.files.installUploader(uploadFile, doImport);
+
+        var downloadFile = createLooperButton(container, "download file");
+        io.files.installDownloader(downloadFile, doExport);
+
+        var saveGist = createLooperButton(container, "save gist");
+        io.gists.installSaver(saveGist, doExport);
+        var loadGist = createLooperButton(container, "load gist");
+        io.gists.installLoader(loadGist, doImport);
+        fileButton.addEventListener('click', function(){
+            modal.replaceContent(container);
+            var butRect = fileButton.getBoundingClientRect();
+            container.style.left = butRect.left + 'px';
+            container.style.bottom = (pageHeight() - butRect.top)  +  'px';
+            modal.show();
+        });
+    };
+    
+    var pageHeight = function(){
+        var body = document.body,
+            html = document.documentElement;
+        return Math.max( body.scrollHeight, body.offsetHeight, 
+                         html.clientHeight, html.scrollHeight, 
+                         html.offsetHeight );
+    };
+
 
     ui.install = function(opts){
         var modal = createModal();
@@ -280,16 +317,8 @@ var ui = {};
             var button = createLooperButton(looperParent, actionName);
             button.addEventListener("click", looOpts[actionName], false);
         });
-
-        var uploadFile = createLooperButton(looperParent, "upload file");
-        io.files.installUploader(uploadFile, looOpts.importData);
-        var downloadFile = createLooperButton(looperParent, "download file");
-        io.files.installDownloader(downloadFile, looOpts.exportData);
-
-        var saveGist = createLooperButton(looperParent, "save gist");
-        io.gists.installSaver(saveGist, looOpts.exportData);
-        var loadGist = createLooperButton(looperParent, "load gist");
-        io.gists.installLoader(loadGist, looOpts.importData);
+        createFileMenu(modal, looperParent, 
+                       looOpts.importData, looOpts.exportData);
     };
 })();
 

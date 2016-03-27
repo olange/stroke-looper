@@ -80,7 +80,9 @@ var makeLine = function(color, strokeWidth, longevity, intervalDuration, start){
             referencePath.removeSegments();
             referencePath.addSegments(newdata.segments);
             referencePath.segments.forEach(function(s){ s.smooth(); });
-            delete newdata.segments;
+            //don't delete the segments, they might be needed for redo
+            // but why was this even deleted in the first place?
+            //delete newdata.segments;
             data = newdata;
             data.start = data.start;
         }

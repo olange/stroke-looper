@@ -23,12 +23,14 @@ var looper = {};
     };
     
     var importData = function(data){
+        console.log(data);
         clearLines();
         var now = Date.now();
         state.defaultDuration = data.duration;
         data.lineData.forEach(function(dt){
             var line = makeLine(dt.color, dt.strokeWidth, dt.longevity,
                                 dt.duration, now);
+            console.log(dt);
             line.importData(dt);
             state.lines.push(line);
         });
