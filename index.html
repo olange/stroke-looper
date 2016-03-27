@@ -14,10 +14,6 @@
     <script type="text/javascript" src="js/ui.js"></script>
     <script type="text/javascript">
      var run = function(){
-         io.files.installUploader("upldFileLink", looper.importData);
-         io.files.installDownloader("dwnldFileLink", looper.exportData);
-         io.gists.installSaver("saveGistLink", looper.exportData);
-         io.gists.installLoader("loadGistLink", looper.importData);
 
          var urlParams = urlUtils.getUrlParams();
          var durationInSeconds = parseFloat(urlParams.duration);
@@ -25,15 +21,20 @@
          if(urlParams.gist){
              io.gists.load(urlParams.gist, looper.importData);
          }
-         looper.installClear("clear");
-         actions.installUnRedo("undo","redo");
-         var pause = document.getElementById('pause');
-         pause.addEventListener('click', looper.togglePause); 
-         ui.install({lineConfig: {
-             id: 'line-config',
-             handleColor: function(c){ looper.setLineColor(c); },
-             handleStrokeWidth: function(w){ looper.setStrokeWidth(w); },
-             handleLongevity: function(l){ looper.setLongevity(l*500); }}});
+         ui.install({
+             lineControl: {
+                 id: 'line-control',
+                 handleColor: function(c){ looper.setLineColor(c); },
+                 handleStrokeWidth: function(w){ looper.setStrokeWidth(w); },
+                 handleLongevity: function(l){ looper.setLongevity(l*500); }},
+             looperControl: {id: 'looper-control',
+                             clear: looper.clear.bind(looper),
+                             undo: actions.undo.bind(actions),
+                             redo: actions.redo.bind(actions),
+                             pause: looper.togglePause.bind(looper),
+                             importData: looper.importData.bind(looper),
+                             exportData: looper.exportData.bind(looper)}
+         });
      };
 
      document.addEventListener('DOMContentLoaded', run);
@@ -45,7 +46,7 @@
          margin: 0;
          padding: 0;
      }
-     #line-config {
+     #line-control {
          vertical-align: top;
          background-color: #E0E0E0;}
      #container{
@@ -61,40 +62,17 @@
          width: 1000px;
          height: 600px;
      }
-     #button-row {
+     #looper-control {
          display: flex;
-         font-size: 18px;
      }
-     #button-row > a{
-         padding: 9px 12px;
-         margin: -5px 0px;
-     }
-     a {
-         background-color: #E0E0E0; 
-         color: black;
-         text-decoration:none;
-         cursor: pointer}
-     a:hover {background-color: #C0C0C0; }
-     a:active {background-color: #A0A0A0; }
     </style>
   </head>
   <body>
     <div id="container">
-      <div id="line-config"></div>
+      <div id="line-control"></div>
       <div>
         <canvas id="myCanvas" ></canvas>
-        <div id="button-row">
-          <a id="undo">
-            undo</a><a id="redo">
-            redo</a><a id="clear">
-            clear</a><a id="pause">
-            pause</a><a id="dwnldFileLink" download="looper.jsonp">
-            download file</a><a id="upldFileLink">
-            upload file</a><a id="saveGistLink">
-            save gist</a><a id="loadGistLink">
-            load gist</a>
-          <input type="file" id="upldFileLinkLoader" style="display:none"/
-        </div>
+        <div id="looper-control"></div>
       </div>
     </div>
   </body>

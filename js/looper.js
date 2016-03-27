@@ -16,14 +16,14 @@ var looper = {};
             duration: state.defaultDuration};
     };
 
-    var clear = function(){
+    var clearLines = function(){
         var oldState = state;
         state = {lines: [], defaultDuration: oldState.defaultDuration};
         oldState.lines.forEach(function(line){ line.clear(); });
     };
     
     var importData = function(data){
-        clear();
+        clearLines();
         var now = Date.now();
         state.defaultDuration = data.duration;
         data.lineData.forEach(function(dt){
@@ -37,22 +37,16 @@ var looper = {};
     var importDataAction = function(data){
         var oldState = state;
         return {do: function(){ importData(data); },
-                undo: function(){ clear();
+                undo: function(){ clearLines();
                                   state = oldState;}};
     };
 
     var clearAction = function(){
         var oldState = state;
-        return {do: function(){ clear(); },
+        return {do: function(){ clearLines(); },
                 undo: function(){ state = oldState ;}};
     };
 
-    var installClear = function(clearLinkId){
-        var clear = function(){ actions.do(clearAction()); };
-        var clearLink = document.getElementById(clearLinkId);
-        clearLink.addEventListener("click", clear, false);
-    };
-    
     var addLineAction = function(line){
         return {do:  function(){ state.lines.push(line); },
                 undo: function(){ state.lines.pop();
@@ -112,7 +106,7 @@ var looper = {};
     looper.init = init;
     looper.exportData = exportData;
     looper.importData = function(d){ actions.do(importDataAction(d)); };
-    looper.installClear = installClear;
+    looper.clear = function(){ actions.do(clearAction()); };
     looper.togglePause = function() { speed = speed ? 0 : 1; };
     looper.setLineColor = function(c) { lineColor = c;};
     looper.setStrokeWidth = function(w) { strokeWidth = w;};

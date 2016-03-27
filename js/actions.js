@@ -31,5 +31,7 @@ var actions = (function(){
     };
 
     return {installUnRedo: installUnRedo,
+            undo: undo,
+            redo: redo,
             do: doit};
 })();

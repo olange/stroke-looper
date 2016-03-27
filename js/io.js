@@ -3,13 +3,10 @@ var io = {
         return "load(" + JSON.stringify(data) + ");"; 
     }};
 io.files = {
-    installUploader: function(uploadLinkId, load){
-        // <a id="uploadFileLink">upload file</a>
-        // <input type="file" id="uploadFileLinkLoader" style="display:none"/>
-        var loaderId = uploadLinkId+'Loader';
-        var upload = function(){
-            document.getElementById(loaderId).click();
-        };
+    installUploader: function(uploadLink, load){
+        var loader = document.createElement('input');
+        loader.type = 'file';
+        loader.style.display= 'none';
         var handleJson = function(uploadEvent){
             var reader = new FileReader();
             reader.onload = function(readerEvent){
@@ -22,19 +19,16 @@ io.files = {
             };
             reader.readAsDataURL(uploadEvent.target.files[0]);     
         };
-        var uploadLink = document.getElementById(uploadLinkId);
-        uploadLink.addEventListener("click", upload, false);
-        var loader = document.getElementById(loaderId);
         loader.addEventListener('change', handleJson, false);
+        uploadLink.addEventListener("click", loader.click.bind(loader), false);
     },
     dataAsUri: function(data){
         var jsonpData = io.convertToJsonp(data);
         var dataUriPrefix = 'data:application/javascript;base64,';
         return dataUriPrefix  + btoa(jsonpData);
     },
-    installDownloader: function(downloadLinkId, getData){
-        // <a id="downloadFileLink" download="looper.jsonp">download</a> 
-        var downloadLink = document.getElementById(downloadLinkId);
+    installDownloader: function(downloadLink, getData){
+        downloadLink.setAttribute('download', 'looper.jsonp');
         var download = function(){
             downloadLink.href = this.dataAsUri(getData());
         }.bind(this);
@@ -58,11 +52,10 @@ io.gists = {
             },console.error.bind(console));
     },
 
-    installSaver: function(saveGistLinkId, getData){
+    installSaver: function(saveGistLink, getData){
         var saver = function(){
             this.save(getData);
         }.bind(this);
-        var saveGistLink = document.getElementById(saveGistLinkId);
         saveGistLink.addEventListener("click", saver, false);
     },
 
@@ -79,7 +72,7 @@ io.gists = {
             },console.error.bind(console));
     },
 
-    installLoader: function(loadGistLinkId, load){
+    installLoader: function(loadGistLink, load){
         var promptGist = function(){
             var id = prompt("gist to load").trim();
             if(id){
@@ -87,7 +80,6 @@ io.gists = {
                 this.load(id, load);
             }
         }.bind(this);
-        var loadLink = document.getElementById(loadGistLinkId);
-        loadLink.addEventListener("click", promptGist, false);
+        loadGistLink.addEventListener("click", promptGist, false);
     }
 };

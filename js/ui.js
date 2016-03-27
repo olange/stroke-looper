@@ -1,20 +1,20 @@
 var ui = {};
 (function() {
     var createModal = function(){
-        var div = document.createElement('div');
-        div.style.cssText = "z-index:1; display:none; position:fixed";
-        div.style.cssText += "top:0; left:0; width:100%; height:100%;";
-        document.body.insertBefore(div, document.body.firstChild);
+        var modaldiv = document.createElement('div');
+        modaldiv.style.cssText = "z-index:1; display:none; position:fixed";
+        modaldiv.style.cssText += "top:0; left:0; width:100%; height:100%;";
+        document.body.insertBefore(modaldiv, document.body.firstChild);
         var hide = function(e){
-            if(!e || e.target === div){div.style.display='none';} };
-        div.addEventListener('click', hide);
+            if(!e || e.target === modaldiv){modaldiv.style.display='none';} };
+        modaldiv.addEventListener('click', hide);
         return {replaceContent: function(c){
-                    while (div.hasChildNodes()) {
-                        div.removeChild(div.lastChild);
+                    while (modaldiv.hasChildNodes()) {
+                        modaldiv.removeChild(modaldiv.lastChild);
                     }
-                    div.appendChild(c);
+                    modaldiv.appendChild(c);
                 },
-                show: function(){ div.style.display=''; },
+                show: function(){ modaldiv.style.display=''; },
                 hide: hide
                };
     };
@@ -27,7 +27,7 @@ var ui = {};
             '<div style="width:'+size+'px; height:'+size+'px;',
             ' background-color: white; font: 14px arial,sans-serif;',
             ' text-align: center; line-height:'+(size)+'px"',
-            ' class="line-config-control">',
+            ' class="line-control-button">',
             '  <span style="">',
             initialLongevity+'</span>s',
             '</div>'
@@ -46,7 +46,7 @@ var ui = {};
                       }};
         var pick = createSlider(0.1, 10, false, picker, modal, false);
         button.addEventListener('click', pick);
-        return picker;
+        return picker.button;
     };
 
     var createStrokeWidthPicker = function (modal, handleStrokeWidth, 
@@ -58,7 +58,7 @@ var ui = {};
             ' border-radius:50%; background-color: black; color:white;',
             ' text-align:center; vertical-align:middle;',
             ' line-height:'+(size-3)+'px"',
-            ' class="line-config-control">',
+            ' class="line-control-button">',
             '  <span style="font: 14px arial,sans-serif;">',
             initialStrokeWidth+'</span>',
             '</div>'
@@ -76,19 +76,44 @@ var ui = {};
                       }};
         var pick = createSlider( 0, 6.5, true, picker, modal, false);
         button.addEventListener('click', pick);
-        return picker;
+        return picker.button;
     };
 
-    var insertLineConfigCss = function(size){
+    var insertLineControlButtonCss = function(size){
         var style = document.createElement('style');
         style.innerHTML = [
-            '.line-config-control {',
+            '.line-control-button {',
             '  cursor: pointer;',
             '  width: '+size+'px;',
             '  height: '+size+'px;',
             '  margin: 5px;}'
         ].join('');
         document.getElementsByTagName('head')[0].appendChild(style);
+    };
+
+    var insertLooperControlButtonCss = function(){
+        var style = document.createElement('style');
+        style.innerHTML = [
+            '.looper-control-button{',
+            'font-size: 18px;',
+            'padding: 9px 12px;',
+            'margin: -5px 0px;',
+            'background-color: #E0E0E0; ',
+            'color: black;',
+            'text-decoration:none;',
+            'cursor: pointer}',
+            '.looper-control-button:hover {background-color: #C0C0C0; }',
+            '.looper-control-button:active {background-color: #A0A0A0; }'
+        ].join('');
+        document.getElementsByTagName('head')[0].appendChild(style);
+    };
+
+    var createLooperButton = function(parent, text){
+        var button = document.createElement('a');
+        button.className = 'looper-control-button';
+        button.innerHTML = text;
+        parent.appendChild(button);
+        return button;
     };
 
     var insertSliderCss = function(size){
@@ -181,7 +206,7 @@ var ui = {};
         button.appendChild(colorPatch);
         colorPatch.style.cssText = "width:"+size+"px; height:"+size+"px;"
             +" background-color:"+picker.color;
-        colorPatch.className = 'line-config-control';
+        colorPatch.className = 'line-control-button';
 
         //dialog
         var container = document.createElement('div');
@@ -214,7 +239,7 @@ var ui = {};
         };
         
         button.addEventListener('click', pickColor);
-        return picker;
+        return picker.button;
     };
 
     var makeColorRange = function(){
@@ -233,21 +258,47 @@ var ui = {};
     ui.install = function(opts){
         var modal = createModal();
         var size = 35;
-        insertLineConfigCss(size);
+        insertLineControlButtonCss(size);
+        insertLooperControlButtonCss();
         insertSliderCss(size);
-        var lcOpts = opts.lineConfig;
-        var lineConfig = document.getElementById(lcOpts.id);
 
-        var colorPicker = createColorPicker(
-            modal, lcOpts.handleColor, makeColorRange(), size);
-        lineConfig.appendChild(colorPicker.button);
+        var linOpts = opts.lineControl;
+        var lineParent = document.getElementById(linOpts.id);
+        var lineControls = [
+            createColorPicker(modal, linOpts.handleColor, makeColorRange(),
+                              size),
+            createStrokeWidthPicker(modal, linOpts.handleStrokeWidth, 2, size),
+            createLongevityPicker(modal, linOpts.handleLongevity, 0.5, size)
+        ].forEach(function(c){
+            lineParent.appendChild(c);
+        });
 
-        var strokeWidthPicker = createStrokeWidthPicker(
-            modal, lcOpts.handleStrokeWidth, 2, size);
-        lineConfig.appendChild(strokeWidthPicker.button);
+        var looOpts = opts.looperControl;
+        var looperParent = document.getElementById(looOpts.id);
+       
+        ['clear', 'undo', 'redo', 'pause'].forEach(function(actionName){
+            var button = createLooperButton(looperParent, actionName);
+            button.addEventListener("click", looOpts[actionName], false);
+        });
 
-        var longevityPicker = createLongevityPicker(
-            modal, lcOpts.handleLongevity, 0.5, size);
-        lineConfig.appendChild(longevityPicker.button);
+        var uploadFile = createLooperButton(looperParent, "upload file");
+        io.files.installUploader(uploadFile, looOpts.importData);
+        var downloadFile = createLooperButton(looperParent, "download file");
+        io.files.installDownloader(downloadFile, looOpts.exportData);
+
+        var saveGist = createLooperButton(looperParent, "save gist");
+        io.gists.installSaver(saveGist, looOpts.exportData);
+        var loadGist = createLooperButton(looperParent, "load gist");
+        io.gists.installLoader(loadGist, looOpts.importData);
     };
 })();
+
+
+
+
+
+
+
+
+
+
