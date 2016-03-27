@@ -26,8 +26,8 @@ var ui = {};
         button.innerHTML = [
             '<div style="width:'+size+'px; height:'+size+'px;',
             ' background-color: white; font: 14px arial,sans-serif;',
-            ' text-align: center;',
-            ' line-height:'+(size)+'px">',
+            ' text-align: center; line-height:'+(size)+'px"',
+            ' class="line-config-control">',
             '  <span style="">',
             initialLongevity+'</span>s',
             '</div>'
@@ -57,7 +57,8 @@ var ui = {};
             '<div style="width:'+size+'px; height:'+size+'px;',
             ' border-radius:50%; background-color: black; color:white;',
             ' text-align:center; vertical-align:middle;',
-            ' line-height:'+(size-3)+'px">',
+            ' line-height:'+(size-3)+'px"',
+            ' class="line-config-control">',
             '  <span style="font: 14px arial,sans-serif;">',
             initialStrokeWidth+'</span>',
             '</div>'
@@ -81,10 +82,7 @@ var ui = {};
     var insertLineConfigCss = function(size){
         var style = document.createElement('style');
         style.innerHTML = [
-            '#line-config {',
-            '  vertical-align: top;',
-            '  background-color: #E0E0E0;}',
-            '#line-config > div {',
+            '.line-config-control {',
             '  cursor: pointer;',
             '  width: '+size+'px;',
             '  height: '+size+'px;',
@@ -183,7 +181,8 @@ var ui = {};
         button.appendChild(colorPatch);
         colorPatch.style.cssText = "width:"+size+"px; height:"+size+"px;"
             +" background-color:"+picker.color;
-        
+        colorPatch.className = 'line-config-control';
+
         //dialog
         var container = document.createElement('div');
         var contCss = 'background-color:#E0E0E0; width:'+(16*(size+4))+'px;';
@@ -236,17 +235,19 @@ var ui = {};
         var size = 35;
         insertLineConfigCss(size);
         insertSliderCss(size);
-        ui.colorPicker = createColorPicker(
-            modal, opts.handleColor, makeColorRange(), size);
-        var lineConfig = document.getElementById('line-config');
-        lineConfig.appendChild(ui.colorPicker.button);
+        var lcOpts = opts.lineConfig;
+        var lineConfig = document.getElementById(lcOpts.id);
 
-        ui.strokeWidthPicker = createStrokeWidthPicker(
-            modal, opts.handleStrokeWidth, 2, size);
-        lineConfig.appendChild(ui.strokeWidthPicker.button);
+        var colorPicker = createColorPicker(
+            modal, lcOpts.handleColor, makeColorRange(), size);
+        lineConfig.appendChild(colorPicker.button);
 
-        ui.longevityPicker = createLongevityPicker(
-            modal, opts.handleLongevity, 0.5, size);
-        lineConfig.appendChild(ui.longevityPicker.button);
+        var strokeWidthPicker = createStrokeWidthPicker(
+            modal, lcOpts.handleStrokeWidth, 2, size);
+        lineConfig.appendChild(strokeWidthPicker.button);
+
+        var longevityPicker = createLongevityPicker(
+            modal, lcOpts.handleLongevity, 0.5, size);
+        lineConfig.appendChild(longevityPicker.button);
     };
 })();
