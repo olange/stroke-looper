@@ -1,7 +1,7 @@
-var makeLine = function(color, strokeWidth, longevity, intervalDuration, start){
+var makeLine = function(color, strokeWidth, lifetime, intervalDuration, start){
     var data = {start: start || Date.now(),
                 lineDuration: 0,
-                longevity: longevity || 500,
+                lifetime: lifetime || 500,
                 color: color || 'black',
                 strokeWidth: strokeWidth || 2,
                 times: []},
@@ -59,7 +59,7 @@ var makeLine = function(color, strokeWidth, longevity, intervalDuration, start){
             if(data.lineDuration){now = now % data.lineDuration;}
             var segmentsToShow = referencePath.segments.filter(function(s, i){
                 var birth = data.times[i];
-                return birth <= now  && now < birth + data.longevity;
+                return birth <= now  && now < birth + data.lifetime;
             });
             //console.log(absoluteNow, data.start, data.lineDuration, now);
             drawingPath.removeSegments();

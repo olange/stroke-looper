@@ -19,8 +19,8 @@ var ui = {};
                };
     };
 
-    var createLongevityPicker = function (modal, handleLongevity, 
-                                            initialLongevity, size)
+    var createLifetimePicker = function (modal, handleLifetime, 
+                                            initialLifetime, size)
     {
         var button = document.createElement('div');
         button.innerHTML = [
@@ -29,22 +29,23 @@ var ui = {};
             ' text-align: center; line-height:'+(size)+'px"',
             ' class="line-control-button">',
             '  <span style="">',
-            initialLongevity+'</span>s',
+            initialLifetime+'</span>s',
             '</div>'
         ].join('');
         window.b = button;
         var number = button.lastChild.children[0];
-        var longevity =  initialLongevity ;
+        var lifetime =  initialLifetime ;
         var picker = {button: button, 
-                      get: function(){return longevity ;},
+                      get: function(){return lifetime ;},
                       set: function(l){ 
-                          longevity= Math.round(l*10)/10 ;
-                          number.innerHTML = longevity;
-                          if(handleLongevity){
-                              handleLongevity(longevity);
+                          lifetime= Math.round(l*10)/10 ;
+                          number.innerHTML = lifetime;
+                          if(handleLifetime){
+                              handleLifetime(lifetime);
                           }
                       }};
         var pick = createSlider(0.1, 10, false, picker, modal, false);
+        handleLifetime(initialLifetime);
         button.addEventListener('click', pick);
         return picker.button;
     };
@@ -75,6 +76,7 @@ var ui = {};
                           }
                       }};
         var pick = createSlider( 0, 6.5, true, picker, modal, false);
+        handleStrokeWidth(initialStrokeWidth);
         button.addEventListener('click', pick);
         return picker.button;
     };
@@ -197,11 +199,12 @@ var ui = {};
         return pickValue;
     };
 
-    var createColorPicker = function (modal, handleColor, colors, size){
+    var createColorPicker = function (modal, handleColor, initialColor, 
+                                      colors, size){
 
         //button
         var button = document.createElement('div');
-        var picker = {button: button, color: colors[0]};
+        var picker = {button: button, color: initialColor};
         var colorPatch = document.createElement('div');
         button.appendChild(colorPatch);
         colorPatch.style.cssText = "width:"+size+"px; height:"+size+"px;"
@@ -238,6 +241,7 @@ var ui = {};
             modal.show();
         };
         
+        handleColor(initialColor);
         button.addEventListener('click', pickColor);
         return picker.button;
     };
@@ -301,11 +305,12 @@ var ui = {};
 
         var linOpts = opts.lineControl;
         var lineParent = document.getElementById(linOpts.id);
+        var colors = makeColorRange();
         var lineControls = [
-            createColorPicker(modal, linOpts.handleColor, makeColorRange(),
+            createColorPicker(modal, linOpts.handleColor, colors[0], colors,
                               size),
-            createStrokeWidthPicker(modal, linOpts.handleStrokeWidth, 2, size),
-            createLongevityPicker(modal, linOpts.handleLongevity, 0.5, size)
+            createStrokeWidthPicker(modal, linOpts.handleStrokeWidth, 5, size),
+            createLifetimePicker(modal, linOpts.handleLifetime, 0.5, size)
         ].forEach(function(c){
             lineParent.appendChild(c);
         });

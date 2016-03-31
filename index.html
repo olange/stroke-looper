@@ -26,7 +26,7 @@
                  id: 'line-control',
                  handleColor: function(c){ looper.setLineColor(c); },
                  handleStrokeWidth: function(w){ looper.setStrokeWidth(w); },
-                 handleLongevity: function(l){ looper.setLongevity(l*500); }},
+                 handleLifetime: function(l){ looper.setLifetime(l*500); }},
              looperControl: {id: 'looper-control',
                              clear: looper.clear.bind(looper),
                              undo: actions.undo.bind(actions),
@@ -66,7 +66,7 @@
          display: flex;
      }
      #looper-control > a {
-         margin: -5px 0px;
+         margin: -4px 0px;
      }
     </style>
   </head>

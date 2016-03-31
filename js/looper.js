@@ -4,7 +4,7 @@ var looper = {};
         currentLine,
         lineColor,
         strokeWidth,
-        longevity,
+        lifetime,
         lastTime = 0,
         lastCorrectedTime = 0,
         speed = 1;
@@ -28,7 +28,7 @@ var looper = {};
         var now = Date.now();
         state.defaultDuration = data.duration;
         data.lineData.forEach(function(dt){
-            var line = makeLine(dt.color, dt.strokeWidth, dt.longevity,
+            var line = makeLine(dt.color, dt.strokeWidth, dt.lifetime,
                                 dt.duration, now);
             console.log(dt);
             line.importData(dt);
@@ -62,11 +62,11 @@ var looper = {};
             if(state.defaultDuration){
                 currentLine = makeLine(lineColor,
                                        strokeWidth,
-                                       longevity,
+                                       lifetime,
                                        state.defaultDuration,
                                        lastCorrectedTime);
             }else{
-                currentLine = makeLine(lineColor, strokeWidth, longevity);
+                currentLine = makeLine(lineColor, strokeWidth, lifetime);
             }
             actions.do(addLineAction(currentLine));
         };
@@ -112,7 +112,7 @@ var looper = {};
     looper.togglePause = function() { speed = speed ? 0 : 1; };
     looper.setLineColor = function(c) { lineColor = c;};
     looper.setStrokeWidth = function(w) { strokeWidth = w;};
-    looper.setLongevity = function(l) { longevity = l;};
+    looper.setLifetime = function(l) { lifetime = l;};
 })();
 
 
