@@ -20,8 +20,7 @@ var ui = {};
     };
 
     var createLifetimePicker = function (modal, handleLifetime, 
-                                            initialLifetime, size)
-    {
+                                            initialLifetime, size){
         var button = document.createElement('div');
         button.innerHTML = [
             '<div style="width:'+size+'px; height:'+size+'px;',
@@ -51,8 +50,7 @@ var ui = {};
     };
 
     var createStrokeWidthPicker = function (modal, handleStrokeWidth, 
-                                            initialStrokeWidth, size)
-    {
+                                            initialStrokeWidth, size){
         var button = document.createElement('div');
         button.innerHTML = [
             '<div style="width:'+size+'px; height:'+size+'px;',
@@ -91,31 +89,6 @@ var ui = {};
             '  margin: 5px;}'
         ].join('');
         document.getElementsByTagName('head')[0].appendChild(style);
-    };
-
-    var insertLooperControlButtonCss = function(){
-        var style = document.createElement('style');
-        style.innerHTML = [
-            '.looper-control-button{',
-            'font-size: 18px;',
-            'padding: 9px 12px;',
-            // 'margin: -5px 0px;',
-            'background-color: #E0E0E0; ',
-            'color: black;',
-            'text-decoration:none;',
-            'cursor: pointer}',
-            '.looper-control-button:hover {background-color: #C0C0C0; }',
-            '.looper-control-button:active {background-color: #A0A0A0; }'
-        ].join('');
-        document.getElementsByTagName('head')[0].appendChild(style);
-    };
-
-    var createLooperButton = function(parent, text){
-        var button = document.createElement('a');
-        button.className = 'looper-control-button';
-        button.innerHTML = text;
-        parent.appendChild(button);
-        return button;
     };
 
     var insertSliderCss = function(size){
@@ -259,6 +232,62 @@ var ui = {};
         return colors;
     };
 
+    var insertLooperControlButtonCss = function(){
+        var style = document.createElement('style');
+        style.innerHTML = [
+            '.looper-control-button{',
+            'font-size: 18px;',
+            'padding: 9px 12px;',
+            // 'margin: -5px 0px;',
+            'background-color: #E0E0E0; ',
+            'color: black;',
+            'text-decoration:none;',
+            'cursor: pointer}',
+            '.looper-control-button:hover {background-color: #C0C0C0; }',
+            '.looper-control-button:active {background-color: #A0A0A0; }'
+        ].join('');
+        document.getElementsByTagName('head')[0].appendChild(style);
+    };
+
+    var createLooperButton = function(parent, text){
+        var button = document.createElement('a');
+        button.className = 'looper-control-button';
+        button.innerHTML = text;
+        parent.appendChild(button);
+        return button;
+    };
+    
+    var createSpeedButtons = function(parent, handleSpeed, initialSpeed){
+        var rewind = createLooperButton(parent, "<<");
+        var pausePlay = createLooperButton(parent, "| |");
+        var fastForward = createLooperButton(parent, ">>");
+        var speed; 
+        var set = function(s){
+            speed = s;
+            pausePlay.innerHTML = speed ? "| |": ">&nbsp;";
+            console.log("speed", speed);
+            handleSpeed(speed);
+        };
+        var togglePause = function() { 
+            set(speed ? 0 : 1);
+        };
+        var incr = function(direction){
+            var increase = speed == 0;
+            increase = increase || Math.sign(speed) == Math.sign(direction); 
+            var delta;
+            if(Math.abs(speed) <= 0.125){
+                delta = direction * 0.125; //slomo
+            }else{
+                delta = increase ? speed : speed * -0.5 ;
+            }
+            set(speed + delta); 
+        };
+        set(initialSpeed);
+        pausePlay.addEventListener("click", togglePause, false);
+        rewind.addEventListener("click", function(){incr(-1);}, false);
+        fastForward.addEventListener("click", function(){incr(1);}, false);
+    };
+
     var createFileMenu = function(modal, parent, importData, exportData){
         var fileButton = createLooperButton(parent, "file");
         var container = document.createElement('div');
@@ -295,7 +324,6 @@ var ui = {};
                          html.offsetHeight );
     };
 
-
     ui.install = function(opts){
         var modal = createModal();
         var size = 35;
@@ -318,21 +346,12 @@ var ui = {};
         var looOpts = opts.looperControl;
         var looperParent = document.getElementById(looOpts.id);
        
-        ['clear', 'undo', 'redo', 'pause'].forEach(function(actionName){
+        ['clear', 'undo', 'redo'].forEach(function(actionName){
             var button = createLooperButton(looperParent, actionName);
             button.addEventListener("click", looOpts[actionName], false);
         });
+        createSpeedButtons(looperParent, looOpts.setSpeed, 1);
         createFileMenu(modal, looperParent, 
                        looOpts.importData, looOpts.exportData);
     };
 })();
-
-
-
-
-
-
-
-
-
-

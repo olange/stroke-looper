@@ -109,7 +109,7 @@ var looper = {};
     looper.exportData = exportData;
     looper.importData = function(d){ actions.do(importDataAction(d)); };
     looper.clear = function(){ actions.do(clearAction()); };
-    looper.togglePause = function() { speed = speed ? 0 : 1; };
+    looper.setSpeed = function(s) { speed = s; };
     looper.setLineColor = function(c) { lineColor = c;};
     looper.setStrokeWidth = function(w) { strokeWidth = w;};
     looper.setLifetime = function(l) { lifetime = l;};
