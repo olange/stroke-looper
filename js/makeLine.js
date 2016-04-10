@@ -24,17 +24,18 @@ var makeLine = function(color, strokeWidth, lifetime, intervalDuration, start){
     };
 
     var initDuration = function(absoluteLast){
+        // TODO check that this works with negative last
         var last = absoluteLast - data.start;
         if(intervalDuration){
             // lineDuration is the lowest non-zero multiple of intervalDuration
             // that is greater than last
-            var intervalCount =  Math.max(1, Math.ceil(last / intervalDuration));
+            var intervalCount =  Math.max(1, Math.ceil(last/intervalDuration));
             data.lineDuration = intervalCount * intervalDuration;
         }else{
             data.lineDuration = last ;
         }
     };
- 
+
     return {
         pushSegment: function(point, absoluteNow){
             var now = absoluteNow - data.start,
@@ -54,14 +55,26 @@ var makeLine = function(color, strokeWidth, lifetime, intervalDuration, start){
             //simplifyAndSmooth(referencePath);
        },
         redraw: function(absoluteNow){
-            var now = absoluteNow - data.start;
-            // There is no lineDuration while the line is being drawn.
-            if(data.lineDuration){now = now % data.lineDuration;}
+            var totalElapsedTime = absoluteNow - data.start;
+            // There is no data.lineDuration while the line is being drawn.
+            var lineDuration = data.lineDuration || totalElapsedTime + 1;
+            var elapsed = totalElapsedTime % lineDuration;
+            /* elapsed is negative when speed < 0
+                .start                      .start + lineDuration
+                .-----------------> elapsed = now
+                
+                .start - lineDuration       .start
+                          elapsed <---------. 
+                ------------------> now = elapsed + lineDuration
+             */
+            var now = elapsed < 0 ? lineDuration + elapsed : elapsed;
             var segmentsToShow = referencePath.segments.filter(function(s, i){
                 var birth = data.times[i];
                 return birth <= now  && now < birth + data.lifetime;
             });
-            //console.log(absoluteNow, data.start, data.lineDuration, now);
+            if(!data.lineDuration){
+                console.log(absoluteNow, data.start, lineDuration, now);
+            }
             drawingPath.removeSegments();
             drawingPath.addSegments(segmentsToShow);
         },
