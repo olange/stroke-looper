@@ -1,5 +1,5 @@
-var makeLine = function(color, strokeWidth, lifetime, intervalDuration, start){
-    var data = {start: start || Date.now(),
+var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration){
+    var data = {start: start,
                 lineDuration: 0,
                 lifetime: lifetime || 500,
                 color: color || 'black',
@@ -35,11 +35,33 @@ var makeLine = function(color, strokeWidth, lifetime, intervalDuration, start){
             data.lineDuration = last ;
         }
     };
+    
+    var calculateTimes =  function(dateNow){
+        var totalElapsedTime = dateNow - data.start;
+        // There is no data.lineDuration while the line is being drawn.
+        var lineDuration = data.lineDuration || totalElapsedTime + 1;
+        // Time since the start of last interval.
+        var elapsed = totalElapsedTime % lineDuration;
+        /* elapsed time can be negative when speed < 0
+         .start                      .start + lineDuration
+         .-----------------> elapsed = now
+         
+         .start - lineDuration       .start
+                   elapsed <---------. 
+         ------------------> now = elapsed + lineDuration
+         */
+        var now = elapsed < 0 ? lineDuration + elapsed : elapsed;
+        if(!data.lineDuration){
+            //console.log(dateNow, data.start, lineDuration, now);
+        }
+        return {now: now, duration: lineDuration};
+    };
 
     return {
-        pushSegment: function(point, absoluteNow){
-            var now = absoluteNow - data.start,
+        pushSegment: function(point, dateNow){
+            var now = dateNow - data.start,
                 segment = {point: point};
+            //console.log('push', now);
             data.times.push(now);
             referencePath.add(segment);
             var previousIndex = referencePath.segments.length - 2;
@@ -53,30 +75,20 @@ var makeLine = function(color, strokeWidth, lifetime, intervalDuration, start){
             // unfortunately, this is too expensive. Try a worker?
             //https://developer.mozilla.org/en-US/docs/Web/API/Worker
             //simplifyAndSmooth(referencePath);
-       },
-        redraw: function(absoluteNow){
-            var totalElapsedTime = absoluteNow - data.start;
-            // There is no data.lineDuration while the line is being drawn.
-            var lineDuration = data.lineDuration || totalElapsedTime + 1;
-            var elapsed = totalElapsedTime % lineDuration;
-            /* elapsed is negative when speed < 0
-                .start                      .start + lineDuration
-                .-----------------> elapsed = now
-                
-                .start - lineDuration       .start
-                          elapsed <---------. 
-                ------------------> now = elapsed + lineDuration
-             */
-            var now = elapsed < 0 ? lineDuration + elapsed : elapsed;
-            var segmentsToShow = referencePath.segments.filter(function(s, i){
+        },
+        segmentsToShow:  function(dateNow){
+            var t  = calculateTimes(dateNow);
+            return referencePath.segments.filter(function(s, i){
                 var birth = data.times[i];
-                return birth <= now  && now < birth + data.lifetime;
+                //TODO deal with negative birth
+                // birth = birth < 0 ? birth + t.duration : birth;
+                return birth <= t.now  && t.now < birth + data.lifetime;
             });
-            if(!data.lineDuration){
-                console.log(absoluteNow, data.start, lineDuration, now);
-            }
+        },
+        redraw: function(dateNow){
+            var segments = this.segmentsToShow(dateNow);
             drawingPath.removeSegments();
-            drawingPath.addSegments(segmentsToShow);
+            drawingPath.addSegments(segments);
         },
         clear: function(){
             drawingPath.removeSegments();
