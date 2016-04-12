@@ -8,7 +8,8 @@
         "test": "test"
     },
     "devDependencies" : {
-        "webdriverio": "^3.4.0"
+        "webdriverio": "^3.4.0",
+        "selenium-standalone": "5.1.0"
     },
     "repository": {
         "type": "git",
