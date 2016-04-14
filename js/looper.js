@@ -81,21 +81,14 @@ var looper = {};
         t.onMouseUp = function(){ completeLine(now()); };
     };
     
-    var now = function(){ return correctNow(Date.now()); };
+    var now = function(){ return correctedNow(Date.now()); };
 
-    var correctNow = function(now){
+    var correctedNow = function(now){
         var interval = now - lastTime,
             correctedNow = lastCorrectedTime + interval * speed ;
         lastTime = now;
         lastCorrectedTime = correctedNow;
         return correctedNow;
-    };
-
-    var draw = function(correctedNow){
-        state.lines.forEach(function(line){
-            line.redraw(correctedNow);
-        });
-        view.draw();
     };
 
     var setup = function(canvasId, theDefaultDuration){
@@ -109,7 +102,10 @@ var looper = {};
 
     var start = function(){
         var render = function(){
-            draw(now());
+            state.lines.forEach(function(line){
+                line.redraw(now());
+            });
+            view.draw();
             requestAnimationFrame(render);
         };
         render();
@@ -124,7 +120,7 @@ var looper = {};
     looper.start = start;
     looper.exportData = exportData;
     looper.now = now;
-    looper.correctNow = correctNow;
+    looper.correctedNow = correctedNow;
     looper.newLine = newLine;
     looper.drawPoint = drawPoint;
     looper.completeLine = completeLine;

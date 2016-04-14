@@ -46,22 +46,36 @@ webdriverio.remote(options).init().url(urlIndex)
 
 webdriverio.remote(options).init().url(urlTest)
     .execute(function(){
-        var assert = chai.assert;
-        looper.setup('myCanvas', 2000);
-        looper.setLifetime(100);
+        var ass = chai.assert;
+        var duration = 2000;
+        var lifetime = 100;
+        looper.setup('myCanvas', duration);
+        looper.setLifetime(lifetime);
         var start = 1460480954631;
         var ms = start;
-        var line = looper.newLine(looper.correctNow(new Date(ms)));
-        looper.drawPoint(100,50,looper.correctNow(new Date(ms+=50)));
-        looper.drawPoint(110,60,looper.correctNow(new Date(ms+=50)));
-        looper.drawPoint(120,80,looper.correctNow(new Date(ms+=50)));
-        looper.completeLine(looper.correctNow(new Date(ms+=50)));
-        var data = line.exportData();        
-        assert.deepEqual([50, 100, 150], data.times);
-        var segmentToXy = function(s){return [s.point.x, s.point.y];};
-        var segs = line.segmentsToShow(start + 101).map(segmentToXy);
-        assert.deepEqual([[100, 50], [110, 60]], segs);
-    }).then(function(a){console.log('test 2 ok');},
+        var l = looper.newLine(looper.correctedNow(new Date(ms)));
+        looper.drawPoint(100,50,looper.correctedNow(new Date(ms+=50)));
+        looper.drawPoint(110,60,looper.correctedNow(new Date(ms+=50)));
+        looper.drawPoint(120,80,looper.correctedNow(new Date(ms+=50)));
+        looper.completeLine(looper.correctedNow(new Date(ms+=50)));
+        var data = l.exportData();        
+        ass.deepEqual([50, 100, 150], data.times);
+
+        var segmentsAt = function(line, time){
+            return line.segmentsToShow(time).map(function(s){
+                return [s.point.x, s.point.y]; });
+        };
+        ass.deepEqual([], segmentsAt(l, start + 49));
+        ass.deepEqual([[100, 50]], segmentsAt(l, start + 50));
+        ass.deepEqual([[100, 50]], segmentsAt(l, start + 50 - duration));
+        ass.deepEqual([[100, 50], [110, 60]], segmentsAt(l, start + 100));
+        ass.deepEqual(
+            [[100, 50], [110, 60]], segmentsAt(l, start + 100 + duration));
+        ass.deepEqual([[110, 60], [120, 80] ], segmentsAt(l, start + 150));
+        ass.deepEqual([[120, 80]], segmentsAt(l, start + 200));
+        ass.deepEqual([], segmentsAt(l, start + 250));
+        
+    }).then(function(r){console.log(r.value || '', 'test 2 ok');},
             function(e){console.error("FAILED: ",e.message);error = e;})
     .end() ;
 
