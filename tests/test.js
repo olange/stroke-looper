@@ -25,8 +25,8 @@ var runBrowserTest = function(client, url, testName, testFunction){
     }
     return client
         .execute(testFunction)
-        .then(function(r){console.log(r.value || '', testName, 'ok');},
-              function(e){console.error("FAILED: ",e.message);});
+        .then(function(r){console.log(r.value || '', testName, 'OK');},
+              function(e){console.error(testName, "FAILED:", e.message);});
 };
 client = client.url(urlIndex)
     .title(function(err,res) {
@@ -86,9 +86,6 @@ client = runBrowserTest(client, null, 'normal curve', function(){
 });
 
 client = runBrowserTest(client, null, 'curve at creation', function(){
-    var ass = chai.assert;
-    var duration = 2000;
-    var lifetime = 100;
     var start = 1460480954631;
     var now = start;
 
@@ -115,6 +112,24 @@ client = runBrowserTest(client, null, 'curve at creation', function(){
     ass.deepEqual([[120, 80]], segmentsAt(l, start + 200));
     ass.deepEqual([], segmentsAt(l, start + 250));
     
+});
+
+client = runBrowserTest(client, urlTest, 'corrected now', function(){
+    var ass = chai.assert;
+    looper.setup('myCanvas', 2000);
+    var now = 0;
+
+    ass.equal(0, looper.correctedNow(new Date(0)));
+    ass.equal(100, looper.correctedNow(new Date(100)));
+
+    looper.setSpeed(2);
+    ass.equal(300, looper.correctedNow(new Date(200)));
+    
+    looper.setSpeed(-1);
+    ass.equal(280, looper.correctedNow(new Date(220)));
+    
+    looper.setSpeed(-0.5);
+    ass.equal(270, looper.correctedNow(new Date(240)));
 });
 
 client.end() ;
