@@ -58,6 +58,7 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration){
     };
 
     return {
+        calculateTimes: calculateTimes ,
         pushSegment: function(point, dateNow){
             var now = dateNow - data.start,
                 segment = {point: point};

@@ -50,7 +50,7 @@ client = client.url(urlIndex)
     .then(function(a){console.log('test 1 ok');},
           function(e){console.error("FAILED: ",e.message);});
 
-client = runBrowserTest(client, urlTest, 'set up looper', function(){
+var setupLooper = function(){
     window.ass = chai.assert;
     window.duration = 2000;
     var lifetime = 100;
@@ -60,8 +60,9 @@ client = runBrowserTest(client, urlTest, 'set up looper', function(){
         return line.segmentsToShow(time).map(function(s){
             return [s.point.x, s.point.y]; });
     };
-});
+};
 
+client = runBrowserTest(client, urlTest, 'set up looper', setupLooper);
 client = runBrowserTest(client, null, 'normal curve', function(){
     var start = 1460480954631;
     var ms = start;
@@ -111,6 +112,26 @@ client = runBrowserTest(client, null, 'curve at creation', function(){
     ass.deepEqual([[110, 60], [120, 80] ], segmentsAt(l, start + 150));
     ass.deepEqual([[120, 80]], segmentsAt(l, start + 200));
     ass.deepEqual([], segmentsAt(l, start + 250));
+    
+});
+
+client = runBrowserTest(client, urlTest, 'set up looper', setupLooper);
+client = runBrowserTest(client, null, 'curve at creation, reverse', function(){
+    var start = 5000;
+    var now = start;
+    looper.setSpeed(-1);
+    
+    var corNow = looper.correctedNow(new Date(now));
+    var l = looper.newLine(corNow);
+    var t = l.calculateTimes(corNow);
+    var logmessage = [now, corNow, t.now, t.duration].join(', ') + "\n";
+    
+    corNow = looper.correctedNow(new Date(now+=50));
+    t = l.calculateTimes(corNow);
+    logmessage += [now, corNow, t.now, t.duration].join(', ') + "\n";
+    looper.drawPoint(100, 50, corNow);
+    return logmessage;
+    ass.deepEqual([[100, 50]], segmentsAt(l, start - 50));
     
 });
 
