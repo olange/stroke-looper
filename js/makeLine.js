@@ -54,11 +54,25 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration){
         if(!data.lineDuration){
             //console.log(dateNow, data.start, lineDuration, now);
         }
-        return {now: now, duration: lineDuration};
+        return {now: now, duration: lineDuration };
     };
 
     return {
         calculateTimes: calculateTimes ,
+        segmentsToShow:  function(dateNow){
+            var t  = calculateTimes(dateNow);
+            return referencePath.segments.filter(function(s, i){
+                var birth = data.times[i];
+                //TODO deal with negative birth
+                // birth = birth < 0 ? birth + t.duration : birth;
+                return birth <= t.now  && t.now < birth + data.lifetime;
+            });
+        },
+        redraw: function(dateNow){
+            var segments = this.segmentsToShow(dateNow);
+            drawingPath.removeSegments();
+            drawingPath.addSegments(segments);
+        },
         pushSegment: function(point, dateNow){
             var now = dateNow - data.start,
                 segment = {point: point};
@@ -76,20 +90,6 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration){
             // unfortunately, this is too expensive. Try a worker?
             //https://developer.mozilla.org/en-US/docs/Web/API/Worker
             //simplifyAndSmooth(referencePath);
-        },
-        segmentsToShow:  function(dateNow){
-            var t  = calculateTimes(dateNow);
-            return referencePath.segments.filter(function(s, i){
-                var birth = data.times[i];
-                //TODO deal with negative birth
-                // birth = birth < 0 ? birth + t.duration : birth;
-                return birth <= t.now  && t.now < birth + data.lifetime;
-            });
-        },
-        redraw: function(dateNow){
-            var segments = this.segmentsToShow(dateNow);
-            drawingPath.removeSegments();
-            drawingPath.addSegments(segments);
         },
         clear: function(){
             drawingPath.removeSegments();
