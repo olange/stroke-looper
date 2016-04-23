@@ -18,6 +18,7 @@ var dir = __dirname.substr(0,__dirname.indexOf('tests'));
 dir = dir.replace(/\\/g, '/');
 var urlIndex = 'file:///' + dir + 'index.html';
 var urlTest = 'file:///' + dir + 'test.html';
+var urlBrowserTest = 'file:///' + dir + 'browserTests.html';
 var client = webdriverio.remote(options).init();
 var runBrowserTest = function(client, url, testName, testFunction){
     if(url){
@@ -67,6 +68,16 @@ var setupLooper = function(){
     //for testing in browser
     //window.log = console.log.bind(console)
 };
+
+client = client.url(urlBrowserTest)
+    .execute(function(){
+        setupLooper();
+        redirectLogToVar();
+        normalCurve();
+        return logMessage;
+    })
+    .then(function(r){console.log(r.value || '', 'OK');},
+              function(e){console.error("FAILED:", e);});
 
 client = runBrowserTest(client, urlTest, 'set up looper', setupLooper);
 client = runBrowserTest(client, null, 'normal curve', function(){
