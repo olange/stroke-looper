@@ -1,26 +1,37 @@
 
 var redirectLogToVar = function(){
     window.logMessage = "";
-    window.log = function(message){
-        window.logMessage += message + "\n"; 
+    window.log = function(){
+        var message = Array.prototype.slice.call(arguments).join('\n');
+        logMessage += (logMessage ? "\n" : "") + message; 
     };
 };
 
+var segmentsAt = function(line, time){
+    return line.segmentsToShow(time).map(function(s){
+        return [s.point.x, s.point.y]; });
+};
+
+var log = console.log.bind(console);
+var ass = chai.assert;
+
 var setupLooper = function(){
-    window.ass = chai.assert;
     window.duration = 2000;
     var lifetime = 100;
     looper.setup('myCanvas', duration);
     looper.setLifetime(lifetime);
-    window.segmentsAt = function(line, time){
-        return line.segmentsToShow(time).map(function(s){
-            return [s.point.x, s.point.y]; });
-    };
-    window.log = console.log.bind(console);
 };
 
+var allTests = function(){
+    try{
+        normalCurve();
+    }catch(e){
+        log(e.message, e.stack);
+    }
+};
 
 var normalCurve = function(){
+    setupLooper();
     log('normalCurve');
     var start = 1460480954631;
     var ms = start;
@@ -30,7 +41,7 @@ var normalCurve = function(){
     looper.drawPoint(120,80,looper.correctedNow(new Date(ms+=50)));
     looper.completeLine(looper.correctedNow(new Date(ms+=50)));
     var data = l.exportData();        
-    ass.deepEqual([50, 100, 150], data.times);
+    ass.deepEqual([51, 100, 150], data.times);
     ass.equal(2000, data.lineDuration);
 
     ass.deepEqual([], segmentsAt(l, start + 49));

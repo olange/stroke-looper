@@ -20,7 +20,7 @@ var urlIndex = 'file:///' + dir + 'index.html';
 var urlTest = 'file:///' + dir + 'test.html';
 var urlBrowserTest = 'file:///' + dir + 'browserTests.html';
 var client = webdriverio.remote(options).init();
-var runBrowserTest = function(client, url, testName, testFunction){
+var runBrowserTest0 = function(client, url, testName, testFunction){
     if(url){
        client = client.url(url);
     }
@@ -29,6 +29,7 @@ var runBrowserTest = function(client, url, testName, testFunction){
         .then(function(r){console.log(r.value || '', testName, 'OK');},
               function(e){console.error(testName, "FAILED:", e.message);});
 };
+
 client = client.url(urlIndex)
     .title(function(err,res) {
         assert.equal(res.value,'stroke looper');
@@ -69,18 +70,19 @@ var setupLooper = function(){
     //window.log = console.log.bind(console)
 };
 
-client = client.url(urlBrowserTest)
-    .execute(function(){
-        setupLooper();
-        redirectLogToVar();
-        normalCurve();
-        return logMessage;
-    })
-    .then(function(r){console.log(r.value || '', 'OK');},
-              function(e){console.error("FAILED:", e);});
+var runBrowserTest = function(client, testFunction){
+    return client = client.url(urlBrowserTest)
+        .execute(function(){ redirectLogToVar(); })
+        .execute(testFunction)
+        .execute(function(){ return logMessage; })
+        .then(function(r){if(r.value){ console.log(r.value);}},
+              function(e){console.error("FAILED:", e.message);});
+};
+//client = runBrowserTest(client, function(){normalCurve();});
+client = runBrowserTest(client, function(){allTests();});
 
-client = runBrowserTest(client, urlTest, 'set up looper', setupLooper);
-client = runBrowserTest(client, null, 'normal curve', function(){
+client = runBrowserTest0(client, urlTest, 'set up looper', setupLooper);
+client = runBrowserTest0(client, null, 'normal curve', function(){
     var start = 1460480954631;
     var ms = start;
     var l = looper.newLine(looper.correctedNow(new Date(ms)));
@@ -104,7 +106,7 @@ client = runBrowserTest(client, null, 'normal curve', function(){
     
 });
 
-client = runBrowserTest(client, null, 'reversed curve', function(){
+client = runBrowserTest0(client, null, 'reversed curve', function(){
     var start = 1460480954631;
     var now = start;
 
@@ -144,8 +146,8 @@ client = runBrowserTest(client, null, 'reversed curve', function(){
     */
 });
 
-client = runBrowserTest(client, urlTest, 'set up looper', setupLooper);
-client = runBrowserTest(client, null, 'curve at creation', function(){
+client = runBrowserTest0(client, urlTest, 'set up looper', setupLooper);
+client = runBrowserTest0(client, null, 'curve at creation', function(){
     var start = 1460480954631;
     var now = start;
     looper.setSpeed(1);
@@ -174,7 +176,7 @@ client = runBrowserTest(client, null, 'curve at creation', function(){
     
 });
 
-client = runBrowserTest(client, urlTest, 'corrected now', function(){
+client = runBrowserTest0(client, urlTest, 'corrected now', function(){
     var ass = chai.assert;
     looper.setup('myCanvas', 2000);
     var now = 0;
@@ -192,8 +194,8 @@ client = runBrowserTest(client, urlTest, 'corrected now', function(){
     ass.equal(270, looper.correctedNow(new Date(240)));
 });
 
-client = runBrowserTest(client, urlTest, 'set up looper', setupLooper);
-client = runBrowserTest(client, null, 'curve at creation, reverse', function(){
+client = runBrowserTest0(client, urlTest, 'set up looper', setupLooper);
+client = runBrowserTest0(client, null, 'curve at creation, reverse', function(){
     var start = 5000;
     var now = start;
     looper.setSpeed(-1);
