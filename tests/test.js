@@ -20,6 +20,7 @@ var urlIndex = 'file:///' + dir + 'index.html';
 var urlBrowserTest = 'file:///' + dir + 'browserTests.html';
 var client = webdriverio.remote(options).init();
 
+console.log('. mouse test');
 client = client.url(urlIndex)
     .title(function(err,res) {
         assert.equal(res.value,'stroke looper');
@@ -39,9 +40,7 @@ client = client.url(urlIndex)
         assert.deepEqual([20,50], line.segments[0]);
         assert.deepEqual([30,70], line.segments[1]);
     })
-    .then(function(a){console.log('test 1 ok');},
-          function(e){console.error("FAILED: ",e.message);});
-
+    .then(null, function(e){console.error(e.message, e.stack);});
 
 var redirectLogToVar = function(){
     window.logMessage = "";
@@ -59,6 +58,8 @@ var runBrowserTest = function(client, testFunction){
         .then(function(r){if(r.value){ console.log(r.value);}},
               function(e){console.error("FAILED:", e.message);});
 };
+
+console.log("----------------\nbrowser tests");
 //client = runBrowserTest(client, function(){normalCurve();});
 client = runBrowserTest(client, function(){allTests();});
 

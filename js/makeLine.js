@@ -23,19 +23,38 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration){
         referencePath.smooth({ type: 'catmull-rom'});
     };
 
-    var initDuration = function(absoluteLast){
-        // TODO check that this works with negative last
-        var last = absoluteLast - data.start;
+    var initDuration = function(dateNow){
+        var elapsed = dateNow - data.start;
+        if(elapsed < 0){
+            // If we're going back in time,
+            // the first point was not drawn at its birth time
+            // but at its death time.
+            elapsed = Math.abs(elapsed) + data.lifetime;
+        }
         if(intervalDuration){
             // lineDuration is the lowest non-zero multiple of intervalDuration
-            // that is greater than last
-            var intervalCount =  Math.max(1, Math.ceil(last/intervalDuration));
-            data.lineDuration = intervalCount * intervalDuration;
+            // that is greater than elapsed
+            var intervCount =  Math.max(1, Math.ceil(elapsed/intervalDuration));
+            data.lineDuration = intervCount * intervalDuration;
         }else{
-            data.lineDuration = last ;
+            data.lineDuration = elapsed ;
         }
+        shiftTimesIntoPositive(data.times, data.lineDuration);
     };
     
+    var shiftTimesIntoPositive = function(times, lineDuration){
+        if(times.length < 1){ return; }
+        var minTime = data.times[0];
+        data.times.forEach(function(time){
+            minTime = Math.min(time, minTime);
+        });
+        var offset = 0;
+        while(minTime + offset < 0){ offset += data.lineDuration; }
+        data.times.forEach(function(time, i){
+            data.times[i] += offset;
+        });
+    };
+
     var calculateTimes =  function(dateNow){
         var totalElapsedTime = dateNow - data.start;
         // There is no data.lineDuration while the line is being drawn.
@@ -51,9 +70,6 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration){
          ------------------> now = elapsed + lineDuration
          */
         var now = elapsed < 0 ? lineDuration + elapsed : elapsed;
-        if(!data.lineDuration){
-            //console.log(dateNow, data.start, lineDuration, now);
-        }
         return {now: now, duration: lineDuration };
     };
 
@@ -74,10 +90,14 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration){
             drawingPath.addSegments(segments);
         },
         pushSegment: function(point, dateNow){
-            var now = dateNow - data.start,
+            var elapsed = dateNow - data.start,
+                // If we're going backwards in time, 
+                // the segment is considered to be pushed
+                // at the end of its lifetime.
+                birth = elapsed < 0 ? elapsed - lifetime : elapsed,
                 segment = {point: point};
             //console.log('push', now);
-            data.times.push(now);
+            data.times.push(birth);
             referencePath.add(segment);
             var previousIndex = referencePath.segments.length - 2;
             referencePath.segments[Math.max(0, previousIndex)].smooth();
