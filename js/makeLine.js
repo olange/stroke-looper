@@ -50,6 +50,7 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration){
         });
         var offset = 0;
         while(minTime + offset < 0){ offset += data.lineDuration; }
+        if(!offset){ return; }
         data.times.forEach(function(time, i){
             data.times[i] += offset;
         });

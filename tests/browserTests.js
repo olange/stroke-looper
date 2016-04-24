@@ -218,9 +218,11 @@ var reverseCurveAtCreation = function(){
     corNow = looper.correctedNow(new Date(now+=50));
     ass.equal(-5200, corNow); 
     ass.equal(-200, l.calculateTimes(corNow).now);
+    ass.equal(-199, l.calculateTimes(corNow).duration);
     ass.deepEqual([[120, 80]], segmentsAt(l, corNow - 1));
     looper.completeLine(corNow);
     ass.equal(1800, l.calculateTimes(corNow).now);
+    ass.equal(2000, l.calculateTimes(corNow).duration);
     ass.deepEqual([ 1850, 1800, 1750 ], l.exportData().times); 
     ass.deepEqual([[120, 80]], segmentsAt(l, corNow - 1));
     // -250    -200    -150    -100    -50     0
