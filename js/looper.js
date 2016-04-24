@@ -1,13 +1,14 @@
 var looper = {};
 (function(){
-    var state = {lines: [], defaultDuration: 0},
-        currentLine,
-        lineColor,
-        strokeWidth,
-        lifetime,
-        lastTime = 0,
-        lastCorrectedTime = 0,
+    var state, currentLine, lineColor, strokeWidth, lifetime, lastTime,
+        lastCorrectedTime, speed;
+    
+    var reset = function(){
+        state = {lines: [], defaultDuration: 0};
+        currentLine = lineColor = strokeWidth = lifetime = null;
+        lastTime = lastCorrectedTime = 0;
         speed = 1;
+    };
 
     var exportData = function(){
         return {
@@ -92,6 +93,7 @@ var looper = {};
     };
 
     var setup = function(canvasId, theDefaultDuration){
+        reset();
         state.defaultDuration = theDefaultDuration;
         console.log("default duration " + state.defaultDuration);
         var canvas = document.getElementById(canvasId);
