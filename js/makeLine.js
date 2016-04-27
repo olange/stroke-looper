@@ -53,7 +53,7 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration){
         });
     };
 
-    var calculateTimes =  function(dateNow){
+    var calculateNow =  function(dateNow){
         var totalElapsedTime = dateNow - data.start;
         // There is no data.lineDuration while the line is being drawn.
         var lineDuration = data.lineDuration || totalElapsedTime + 1;
@@ -67,20 +67,28 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration){
                    elapsed <---------. 
          ------------------> now = elapsed + lineDuration
          */
-        var now = elapsed < 0 ? lineDuration + elapsed : elapsed;
-        return {now: now, duration: lineDuration };
+        return elapsed < 0 ? lineDuration + elapsed : elapsed;
     };
 
     return {
-        calculateTimes: calculateTimes ,
-        segmentsToShow:  function(dateNow){
-            var t  = calculateTimes(dateNow);
+        calculateNow: calculateNow ,
+        segmentsToShow:  function(dateNow, timeOffset){
+            var now  = calculateNow(dateNow);
             return referencePath.segments.filter(function(s, i){
-                var birth = data.times[i];
-                //TODO deal with negative birth
-                // birth = birth < 0 ? birth + t.duration : birth;
-                return birth <= t.now  && t.now < birth + data.lifetime;
+                var birth = data.times[i] - (timeOffset || 0);
+                return birth <= now && now < birth + data.lifetime;
             });
+        },
+        periodSegmentsToShow:  function(dateNow){
+            var ts = data.times;
+            var last = Math.max(ts[ts.length-1], ts[0]);
+            var periodNumber = Math.ceil(last / data.lineDuration);
+            var periodSegments = [];
+            for(var i = 0; i < periodNumber; i++){
+                var segs = this.segmentsToShow(dateNow, i * data.lineDuration);
+                periodSegments.push(segs); 
+            }
+            return periodSegments;
         },
         redraw: function(dateNow){
             var segments = this.segmentsToShow(dateNow);
