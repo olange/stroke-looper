@@ -34,8 +34,8 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration){
         if(intervalDuration){
             // lineDuration is the lowest non-zero multiple of intervalDuration
             // that is greater than elapsed
-            var intervCount =  Math.max(1, Math.ceil(elapsed/intervalDuration));
-            data.lineDuration = intervCount * intervalDuration;
+            var intvCount =  Math.max(1, Math.ceil(elapsed/intervalDuration));
+            data.lineDuration = intvCount * intervalDuration;
         }else{
             data.lineDuration = elapsed ;
         }
@@ -44,10 +44,7 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration){
     
     var shiftTimesIntoPositive = function(times, lineDuration){
         if(times.length < 1){ return; }
-        var minTime = data.times[0];
-        data.times.forEach(function(time){
-            minTime = Math.min(time, minTime);
-        });
+        var minTime = Math.min(data.times[0], data.times[data.times.length-1]);
         var offset = 0;
         while(minTime + offset < 0){ offset += data.lineDuration; }
         if(!offset){ return; }
