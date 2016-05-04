@@ -3,7 +3,7 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration){
                 lineDuration: 0,
                 lifetime: lifetime || 500,
                 color: color || 'black',
-                multiPeriod: true,
+                multiPeriod: false,
                 strokeWidth: strokeWidth || 2,
                 times: []},
 //        drawingPath = makePath(data),
@@ -30,6 +30,7 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration){
     };
 
     var initDuration = function(dateNow){
+        //TODO try to get rid of this method, do everything in calculateNow
         var elapsed = dateNow - data.start;
         if(elapsed < 0){
             // If we're going back in time,
@@ -40,13 +41,11 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration){
         
         if(!intervalDuration){
             data.lineDuration = elapsed ;
-        }else if(data.multiPeriod){
+        }else{
             // lineDuration is the lowest non-zero multiple of intervalDuration
             // that is greater than elapsed
             var intvCount =  Math.max(1, Math.ceil(elapsed/intervalDuration));
             data.lineDuration = intvCount * intervalDuration;
-        }else{
-            data.lineDuration = intervalDuration;
         }
         shiftTimesIntoPositive(data.times, data.lineDuration);
     };
@@ -63,11 +62,21 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration){
     };
 
     var calculateNow =  function(dateNow){
+        /*
+         .start                          .dateNow
+         --------------------------------> totalElapsedTime
+         ...........>...........> lineDurations (if multiPeriod)        
+                                ---------> elapsed (since last line interval)
+         .....>.....>.....>.....>.....> intervalDurations
+                                      ---> elapsed (since last looper interval)
+         */
+
         var totalElapsedTime = dateNow - data.start;
+        var duration = data.multiPeriod ? data.lineDuration : intervalDuration;
         // There is no data.lineDuration while the line is being drawn.
-        var lineDuration = data.lineDuration || totalElapsedTime + 1;
-        // Time since the start of last interval.
-        var elapsed = totalElapsedTime % lineDuration;
+        duration = duration || totalElapsedTime + 1;
+        // Time since the start of last line interval.
+        var elapsed = totalElapsedTime % duration;
         /* elapsed time can be negative when speed < 0
          .start                      .start + lineDuration
          .-----------------> elapsed = now
@@ -76,15 +85,14 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration){
                    elapsed <---------. 
          ------------------> now = elapsed + lineDuration
          */
-        return elapsed < 0 ? lineDuration + elapsed : elapsed;
+        return elapsed < 0 ? duration + elapsed : elapsed;
     };
 
     return {
         calculateNow: calculateNow ,
-        segmentsToShow:  function(dateNow, timeOffset){
-            var now  = calculateNow(dateNow);
+        segmentsToShow:  function(now){
             return referencePath.segments.filter(function(s, i){
-                var birth = data.times[i] - (timeOffset || 0);
+                var birth = data.times[i];
                 return birth <= now && now < birth + data.lifetime;
             });
         },
@@ -97,13 +105,16 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration){
             }
             var periodSegments = [];
             for(var i = 0; i < numberOfPeriods; i++){
-                var segs = this.segmentsToShow(dateNow, i * intervalDuration);
+                var now  = calculateNow(dateNow);
+                var timeOffset = i * intervalDuration;
+                var segs = this.segmentsToShow(now + timeOffset);
                 periodSegments.push(segs); 
             }
             return periodSegments;
         },
         redraw0: function(dateNow){
-            var segments = this.segmentsToShow(dateNow);
+            var now =  this.calculateNow(dateNow);
+            var segments = this.segmentsToShow(now);
             drawingPath.removeSegments();
             drawingPath.addSegments(segments);
         },

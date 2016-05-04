@@ -22,7 +22,8 @@ var setupLooper = function(lifetime){
 };
 
 var segmentsAt = function(line, time){
-    return line.segmentsToShow(time).map(function(s){
+    var now =  line.calculateNow(time);
+    return line.segmentsToShow(now).map(function(s){
         return [s.point.x, s.point.y]; });
 };
 
