@@ -3,7 +3,7 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration){
                 lineDuration: 0,
                 lifetime: lifetime || 500,
                 color: color || 'black',
-                multiPeriod: false,
+                multiPeriod: true,
                 strokeWidth: strokeWidth || 2,
                 times: []},
 //        drawingPath = makePath(data),
@@ -89,15 +89,15 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration){
             });
         },
         periodSegmentsToShow:  function(dateNow){
-            if(!data.lineDuration){
-                return [this.segmentsToShow(dateNow)];
+            var numberOfPeriods = 1; 
+            if(intervalDuration && !data.multiPeriod){
+                var ts = data.times;
+                var last = Math.max(ts[ts.length-1], ts[0]);
+                numberOfPeriods = Math.ceil(last / intervalDuration);
             }
-            var ts = data.times;
-            var last = Math.max(ts[ts.length-1], ts[0]);
-            var periodNumber = Math.ceil(last / data.lineDuration);
             var periodSegments = [];
-            for(var i = 0; i < periodNumber; i++){
-                var segs = this.segmentsToShow(dateNow, i * data.lineDuration);
+            for(var i = 0; i < numberOfPeriods; i++){
+                var segs = this.segmentsToShow(dateNow, i * intervalDuration);
                 periodSegments.push(segs); 
             }
             return periodSegments;
