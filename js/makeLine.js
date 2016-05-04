@@ -3,12 +3,18 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration){
                 lineDuration: 0,
                 lifetime: lifetime || 500,
                 color: color || 'black',
+                multiPeriod: false,
                 strokeWidth: strokeWidth || 2,
                 times: []},
-        drawingPath = new Path({strokeColor: data.color,
-                                strokeWidth: data.strokeWidth,
-                                strokeCap: 'round'}),
+//        drawingPath = makePath(data),
+        drawingPaths = [],
         referencePath = new Path({visible: false});
+
+    var makePath = function(data){
+        return new Path({strokeColor: data.color,
+                         strokeWidth: data.strokeWidth,
+                         strokeCap: 'round'});
+    };
 
     var simplifyAndSmooth = function(referencePath){
         var offsets = referencePath.segments.map(function(s){
@@ -31,13 +37,16 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration){
             // but at its death time.
             elapsed = Math.abs(elapsed) + data.lifetime;
         }
-        if(intervalDuration){
+        
+        if(!intervalDuration){
+            data.lineDuration = elapsed ;
+        }else if(data.multiPeriod){
             // lineDuration is the lowest non-zero multiple of intervalDuration
             // that is greater than elapsed
             var intvCount =  Math.max(1, Math.ceil(elapsed/intervalDuration));
             data.lineDuration = intvCount * intervalDuration;
         }else{
-            data.lineDuration = elapsed ;
+            data.lineDuration = intervalDuration;
         }
         shiftTimesIntoPositive(data.times, data.lineDuration);
     };
@@ -80,6 +89,9 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration){
             });
         },
         periodSegmentsToShow:  function(dateNow){
+            if(!data.lineDuration){
+                return [this.segmentsToShow(dateNow)];
+            }
             var ts = data.times;
             var last = Math.max(ts[ts.length-1], ts[0]);
             var periodNumber = Math.ceil(last / data.lineDuration);
@@ -90,10 +102,20 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration){
             }
             return periodSegments;
         },
-        redraw: function(dateNow){
+        redraw0: function(dateNow){
             var segments = this.segmentsToShow(dateNow);
             drawingPath.removeSegments();
             drawingPath.addSegments(segments);
+        },
+        redraw: function(dateNow){
+            this.periodSegmentsToShow(dateNow).forEach(function(segs, i){
+                if(drawingPaths.length < i + 1){
+                    drawingPaths.push(makePath(data));
+                }
+                var path = drawingPaths[i];
+                path.removeSegments();
+                path.addSegments(segs);
+            });
         },
         pushSegment: function(point, dateNow){
             var elapsed = dateNow - data.start,
