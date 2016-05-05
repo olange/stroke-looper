@@ -29,9 +29,22 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration){
         referencePath.smooth({ type: 'catmull-rom'});
     };
 
-    var initDuration = function(dateNow){
-        //TODO try to get rid of this method, do everything in calculateNow
-        var elapsed = dateNow - data.start;
+    var shiftTimesIntoPositive = function(times, lineDuration){
+        if(times.length < 1){ return; }
+        var minTime = Math.min(data.times[0], data.times[data.times.length-1]);
+        var offset = 0;
+        while(minTime + offset < 0){ offset += lineDuration; }
+        if(!offset){ return; }
+        data.times.forEach(function(time, i){
+            data.times[i] += offset;
+        });
+    };
+
+    var initDuration = function(endDate){
+        // The end time of the line, after the last point is drawn.
+        // This is important when there is no interval duration,
+        // as it keeps the line from restarting immediately.
+        var elapsed = endDate - data.start;
         if(elapsed < 0){
             // If we're going back in time,
             // the first point was not drawn at its birth time
@@ -42,35 +55,30 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration){
         if(!intervalDuration){
             data.lineDuration = elapsed ;
         }else{
-            // lineDuration is the lowest non-zero multiple of intervalDuration
-            // that is greater than elapsed
+            /*
+             .start    .dateNow
+             ---------->    elapsed
+             ......>......> intervalDurations
+             .............> lineDuration:
+                 lowest multiple of intervalDuration greater than elapsed
+             */
             var intvCount =  Math.max(1, Math.ceil(elapsed/intervalDuration));
             data.lineDuration = intvCount * intervalDuration;
         }
         shiftTimesIntoPositive(data.times, data.lineDuration);
     };
     
-    var shiftTimesIntoPositive = function(times, lineDuration){
-        if(times.length < 1){ return; }
-        var minTime = Math.min(data.times[0], data.times[data.times.length-1]);
-        var offset = 0;
-        while(minTime + offset < 0){ offset += data.lineDuration; }
-        if(!offset){ return; }
-        data.times.forEach(function(time, i){
-            data.times[i] += offset;
-        });
-    };
-
     var calculateNow =  function(dateNow){
         /*
          .start                          .dateNow
          --------------------------------> totalElapsedTime
+         multiPeriod:
          ...........>...........> lineDurations (if multiPeriod)        
-                                ---------> elapsed (since last line interval)
+                                 --------> elapsed (since last line interval)
+         not multiPeriod:
          .....>.....>.....>.....>.....> intervalDurations
-                                      ---> elapsed (since last looper interval)
+                                       --> elapsed (since last looper interval)
          */
-
         var totalElapsedTime = dateNow - data.start;
         var duration = data.multiPeriod ? data.lineDuration : intervalDuration;
         // There is no data.lineDuration while the line is being drawn.
@@ -78,12 +86,12 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration){
         // Time since the start of last line interval.
         var elapsed = totalElapsedTime % duration;
         /* elapsed time can be negative when speed < 0
-         .start                      .start + lineDuration
+         .start                      .start + duration
          .-----------------> elapsed = now
          
-         .start - lineDuration       .start
+         .start - duration       .start
                    elapsed <---------. 
-         ------------------> now = elapsed + lineDuration
+         ------------------> now = elapsed + duration
          */
         return elapsed < 0 ? duration + elapsed : elapsed;
     };
