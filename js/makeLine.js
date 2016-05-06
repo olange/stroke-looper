@@ -1,9 +1,9 @@
-var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration){
+var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration,  multiPeriod){
     var data = {start: start,
                 lineDuration: 0,
                 lifetime: lifetime || 500,
                 color: color || 'black',
-                multiPeriod: false,
+                multiPeriod: multiPeriod ,
                 strokeWidth: strokeWidth || 2,
                 times: []},
 //        drawingPath = makePath(data),
