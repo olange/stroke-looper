@@ -1,10 +1,10 @@
 var allTestsWithAlert = function(){
-     log = function(m, s){ console.log(m, s); alert(m, s);};
-     allTests();
+    log = function(m, s){ console.log(m, s); alert(m+ '\n' + (s||''));};
+    allTests();
 };
 var allTests = function(){
     ['normalCurve', 'reversedCurve', 'curveAtCreation' ,'correctedNow',
-     'reverseCurveAtCreationMultiPeriod'
+     'reverseCurveAtCreationMultiPeriod', 'reverseCurveAtCreation'
     ].forEach(runTest);
 };
 var runTest = function(testName, index){
@@ -19,7 +19,7 @@ var runTest = function(testName, index){
 var log = console.log.bind(console);
 var ass = chai.assert;
 
-var setupLooper = function(lifetime){
+var setupLooper = function(lifetime, multiPeriod){
     window.duration = 2000;
     looper.setup('myCanvas', duration);
     looper.setLifetime(lifetime || 100);
@@ -172,14 +172,14 @@ var curveAtCreation = function(){
 
 var reverseCurveAtCreationMultiPeriod = function(){
     var lifetime = 100;
-    setupLooper(lifetime);
+    setupLooper(lifetime, true);
     var start = 5000;
     var now = start;
     looper.setSpeed(-1);
     
     var corNow = looper.correctedNow(new Date(now));
     ass.equal(-5000, corNow); 
-    var l = looper.newLine(corNow);
+    var l = looper.newLine(corNow, true);
     ass.equal(0, l.calculateNow(corNow)); //t.now
     ass.equal(-5000, l.exportData().start);
     

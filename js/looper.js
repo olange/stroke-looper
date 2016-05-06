@@ -1,12 +1,13 @@
 var looper = {};
 (function(){
     var state, currentLine, lineColor, strokeWidth, lifetime, lastTime,
-        lastCorrectedTime, speed;
+        lastCorrectedTime, speed, multiPeriod;
     
-    var reset = function(){
+    var reset = function(theMultiPeriod){
         state = {lines: [], defaultDuration: 0};
         currentLine = lineColor = strokeWidth = lifetime = null;
         lastTime = lastCorrectedTime = 0;
+        multiPeriod = theMultiPeriod;
         speed = 1;
     };
 
@@ -54,13 +55,14 @@ var looper = {};
                 undo: function(){ state.lines.pop();
                                   line.clear();}};
     };
-    var newLine = function(now){
+    var newLine = function(now, multiPeriod){
         if(state.defaultDuration){
             currentLine = makeLine(lineColor,
                                    strokeWidth,
                                    lifetime,
                                    now,
-                                   state.defaultDuration);
+                                   state.defaultDuration,
+                                   multiPeriod);
         }else{
             currentLine = makeLine(lineColor, strokeWidth, lifetime, now);
         }
@@ -77,7 +79,7 @@ var looper = {};
     var installListeners = function(){
         var t = new Tool();
         t.minDistance = 3;
-        t.onMouseDown = function(){ newLine(now()); };
+        t.onMouseDown = function(){ newLine(now(), multiPeriod); };
         t.onMouseDrag = function(e){ drawPoint(e.point.x,e.point.y, now()); };
         t.onMouseUp = function(){ completeLine(now()); };
     };
@@ -92,8 +94,9 @@ var looper = {};
         return correctedNow;
     };
 
-    var setup = function(canvasId, theDefaultDuration){
-        reset();
+    var setup = function(canvasId, theDefaultDuration, multiPeriod){
+        reset(multiPeriod);
+        
         state.defaultDuration = theDefaultDuration;
         console.log("default duration " + state.defaultDuration);
         var canvas = document.getElementById(canvasId);
@@ -113,8 +116,8 @@ var looper = {};
         render();
     };
 
-    var init = function(canvasId, theDefaultDuration){
-        setup(canvasId, theDefaultDuration);
+    var init = function(canvasId, theDefaultDuration, multiPeriod){
+        setup(canvasId, theDefaultDuration, multiPeriod);
         start();
     };
     
