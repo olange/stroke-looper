@@ -72,10 +72,11 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration){
         /*
          .start                          .dateNow
          --------------------------------> totalElapsedTime
-         multiPeriod:
+
+         if multiPeriod:
          ...........>...........> lineDurations (if multiPeriod)        
                                  --------> elapsed (since last line interval)
-         not multiPeriod:
+         else:
          .....>.....>.....>.....>.....> intervalDurations
                                        --> elapsed (since last looper interval)
          */
@@ -83,7 +84,7 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration){
         var duration = data.multiPeriod ? data.lineDuration : intervalDuration;
         // There is no data.lineDuration while the line is being drawn.
         duration = duration || totalElapsedTime + 1;
-        // Time since the start of last line interval.
+        // Time since the start of last interval.
         var elapsed = totalElapsedTime % duration;
         /* elapsed time can be negative when speed < 0
          .start                      .start + duration
