@@ -89,7 +89,7 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration,  
          .start                      .start + duration
          .-----------------> elapsed = now
          
-         .start - duration       .start
+         .start - duration           .start
                    elapsed <---------. 
          ------------------> now = elapsed + duration
          */
