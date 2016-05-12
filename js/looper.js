@@ -98,7 +98,6 @@ var looper = {};
         reset(multiPeriod);
         
         state.defaultDuration = theDefaultDuration;
-        console.log("default duration " + state.defaultDuration);
         var canvas = document.getElementById(canvasId);
         paper.setup(canvas);
         paper.install(window);

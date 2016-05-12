@@ -7,7 +7,7 @@ var allTests = function(){
      'reverseCurveAtCreationMultiPeriod', 'reverseCurveAtCreation'
     ].forEach(runTest);
 };
-var runTest = function(testName, index){
+var runTest = function(testName){
     log('. ' + testName);
     try{
         window[testName]();
@@ -31,6 +31,11 @@ var segmentsAt = function(line, time){
         return [s.point.x, s.point.y]; });
 };
 
+var periodSegmentsAt = function(line, time, period){
+    var now =  line.calculateNow(time);
+    return line.periodSegmentsToShow(now)[period].map(function(s){
+        return [s.point.x, s.point.y]; });
+};
 
 var normalCurve = function(){
     setupLooper();
@@ -188,6 +193,7 @@ var reverseCurveAtCreationMultiPeriod = function(){
     ass.equal(-50, l.calculateNow(corNow)); //t.now
     looper.drawPoint(100, 50, corNow);
     ass.deepEqual([-150], l.exportData().times); //birth
+    //ass.deepEqual([[100, 50]], periodSegmentsAt(l, corNow - 1, 0));
     ass.deepEqual([[100, 50]], segmentsAt(l, corNow - 1));
     // -250    -200    -150    -100    -50
     //                 .birth         .birth + lifetime

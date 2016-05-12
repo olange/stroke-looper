@@ -107,21 +107,27 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration,  
         },
         periodSegmentsToShow:  function(dateNow){
             var numberOfPeriods = 1; 
-            if(intervalDuration && !data.multiPeriod){
-                var ts = data.times;
+            var numberOfEmptyPeriods = 0;
+            var ts = data.times;
+            if(intervalDuration && !data.multiPeriod && ts.length > 0){
                 var last = Math.max(ts[ts.length-1], ts[0]);
-                numberOfPeriods = Math.ceil(last / intervalDuration);
+                var first = Math.min(ts[ts.length-1], ts[0]);
+                var totalNumberOfPeriods = Math.ceil(last / intervalDuration);
+                numberOfEmptyPeriods = Math.floor(first / intervalDuration);
+                numberOfPeriods = totalNumberOfPeriods - numberOfEmptyPeriods;
+                console.log(totalNumberOfPeriods, numberOfEmptyPeriods, numberOfPeriods);
             }
             var periodSegments = [];
             for(var i = 0; i < numberOfPeriods; i++){
                 var now  = calculateNow(dateNow);
-                var timeOffset = i * intervalDuration;
+                var timeOffset = (numberOfEmptyPeriods + i) * intervalDuration;
                 var segs = this.segmentsToShow(now + timeOffset);
                 periodSegments.push(segs); 
             }
             return periodSegments;
         },
         redraw0: function(dateNow){
+            //TODO remove redraw0 and fix import and export
             var now =  this.calculateNow(dateNow);
             var segments = this.segmentsToShow(now);
             drawingPath.removeSegments();
@@ -138,12 +144,19 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration,  
             });
         },
         pushSegment: function(point, dateNow){
-            var elapsed = dateNow - data.start,
+            var elapsed = dateNow - data.start;
+            var birth = elapsed;
+            if(elapsed < 0){
                 // If we're going backwards in time, 
                 // the segment is considered to be pushed
                 // at the end of its lifetime.
-                birth = elapsed < 0 ? elapsed - lifetime : elapsed,
-                segment = {point: point};
+                birth -= lifetime;
+                // make (almost) sure all times are positive
+                if(!data.multiPeriod){
+                    birth += 10000000000000 * intervalDuration;
+                }
+            }
+            var segment = {point: point};
             //console.log('push', now);
             data.times.push(birth);
             referencePath.add(segment);
