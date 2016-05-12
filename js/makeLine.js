@@ -70,6 +70,8 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration,  
     
     var calculateNow =  function(dateNow){
         /*
+         Calculates the time since the beginning of the current interval.
+
          .start                          .dateNow
          --------------------------------> totalElapsedTime
 
@@ -125,13 +127,6 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration,  
                 periodSegments.push(segs); 
             }
             return periodSegments;
-        },
-        redraw0: function(dateNow){
-            //TODO remove redraw0 and fix import and export
-            var now =  this.calculateNow(dateNow);
-            var segments = this.segmentsToShow(now);
-            drawingPath.removeSegments();
-            drawingPath.addSegments(segments);
         },
         redraw: function(dateNow){
             this.periodSegmentsToShow(dateNow).forEach(function(segs, i){
