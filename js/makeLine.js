@@ -83,7 +83,10 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration,  
                                        --> elapsed (since last looper interval)
          */
         var totalElapsedTime = dateNow - data.start;
-        var duration = data.multiPeriod ? data.lineDuration : intervalDuration;
+        //no intervalDuration counts as no multiperiod...
+        var nomp = intervalDuration && !data.multiPeriod;
+        var duration = nomp? intervalDuration : data.lineDuration;
+        // var duration = data.multiPeriod ? data.lineDuration : intervalDuration;
         // There is no data.lineDuration while the line is being drawn.
         duration = duration || totalElapsedTime + 1;
         // Time since the start of last interval.
@@ -122,7 +125,7 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration,  
             var periodSegments = [];
             for(var i = 0; i < numberOfPeriods; i++){
                 var now  = calculateNow(dateNow);
-                var timeOffset = (numberOfEmptyPeriods + i) * intervalDuration;
+                var timeOffset = (numberOfEmptyPeriods + i) * intervalDuration || 0;
                 var segs = this.segmentsToShow(now + timeOffset);
                 periodSegments.push(segs); 
             }

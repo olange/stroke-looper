@@ -17,7 +17,7 @@
 
          var urlParams = urlUtils.getUrlParams();
          var durationInSeconds = parseFloat(urlParams.duration);
-         looper.setup('myCanvas', durationInSeconds * 1000, true);
+         looper.setup('myCanvas', durationInSeconds * 1000, false);
          looper.start();
          if(urlParams.gist){
              io.gists.load(urlParams.gist, looper.importData);
