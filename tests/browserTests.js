@@ -175,9 +175,9 @@ var curveAtCreation = function(){
     
 };
 
-var reverseCurveAtCreationMultiPeriod = function(){
+var reverseCurveAtCreation = function(){
     var lifetime = 100;
-    setupLooper(lifetime, true);
+    setupLooper(lifetime, false);
     var start = 5000;
     var now = start;
     looper.setSpeed(-1);
@@ -241,9 +241,9 @@ var reverseCurveAtCreationMultiPeriod = function(){
     //        . now - 1
 };
 
-var reverseCurveAtCreation = function(){
+var reverseCurveAtCreationMultiPeriod = function(){
     var lifetime = 100;
-    setupLooper(lifetime);
+    setupLooper(lifetime, true);
     var start = 5000;
     var now = start;
     looper.setSpeed(-1);

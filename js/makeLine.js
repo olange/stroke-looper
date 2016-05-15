@@ -3,7 +3,8 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration,  
                 lineDuration: 0,
                 lifetime: lifetime || 500,
                 color: color || 'black',
-                multiPeriod: multiPeriod ,
+                // multiPeriod requires a defined intervalDuration
+                multiPeriod: intervalDuration && multiPeriod ,
                 strokeWidth: strokeWidth || 2,
                 times: []},
 //        drawingPath = makePath(data),
@@ -76,17 +77,16 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration,  
          --------------------------------> totalElapsedTime
 
          if multiPeriod:
-         ...........>...........> lineDurations (if multiPeriod)        
-                                 --------> elapsed (since last line interval)
+         .....>.....>.....>.....>.....> intervalDurations (if multiPeriod) 
+                                       --> elapsed (since last line interval)
          else:
-         .....>.....>.....>.....>.....> intervalDurations
-                                       --> elapsed (since last looper interval)
+         ...........>...........> lineDurations 
+                                 --------> elapsed (since last looper interval)
          */
         var totalElapsedTime = dateNow - data.start;
         //no intervalDuration counts as no multiperiod...
-        var nomp = intervalDuration && !data.multiPeriod;
+        var nomp = data.multiPeriod;
         var duration = nomp? intervalDuration : data.lineDuration;
-        // var duration = data.multiPeriod ? data.lineDuration : intervalDuration;
         // There is no data.lineDuration while the line is being drawn.
         duration = duration || totalElapsedTime + 1;
         // Time since the start of last interval.
@@ -114,13 +114,12 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration,  
             var numberOfPeriods = 1; 
             var numberOfEmptyPeriods = 0;
             var ts = data.times;
-            if(intervalDuration && !data.multiPeriod && ts.length > 0){
+            if(data.multiPeriod && ts.length > 0){
                 var last = Math.max(ts[ts.length-1], ts[0]);
                 var first = Math.min(ts[ts.length-1], ts[0]);
                 var totalNumberOfPeriods = Math.ceil(last / intervalDuration);
                 numberOfEmptyPeriods = Math.floor(first / intervalDuration);
                 numberOfPeriods = totalNumberOfPeriods - numberOfEmptyPeriods;
-                console.log(totalNumberOfPeriods, numberOfEmptyPeriods, numberOfPeriods);
             }
             var periodSegments = [];
             for(var i = 0; i < numberOfPeriods; i++){
@@ -150,7 +149,7 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration,  
                 // at the end of its lifetime.
                 birth -= lifetime;
                 // make (almost) sure all times are positive
-                if(!data.multiPeriod){
+                if(data.multiPeriod){
                     birth += 10000000000000 * intervalDuration;
                 }
             }
@@ -171,7 +170,9 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration,  
             //simplifyAndSmooth(referencePath);
         },
         clear: function(){
-            drawingPath.removeSegments();
+            drawingPaths.forEach(function(drawingPath){
+                drawingPath.removeSegments();
+            });
         },
         exportData: function(){
             var exported = new Object(data);
@@ -181,7 +182,7 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration,  
             return exported;
         },
         importData: function(newdata){
-            drawingPath.removeSegments();
+            this.clear();
             referencePath.removeSegments();
             referencePath.addSegments(newdata.segments);
             referencePath.segments.forEach(function(s){ s.smooth(); });
