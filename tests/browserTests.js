@@ -274,7 +274,6 @@ var reverseCurveAtCreation = function(){
     corNow = looper.correctedNow(new Date(now+=50));
     ass.equal(-5050, corNow); 
     ass.equal(-50, l.calculateNow(corNow)); //t.now
-    //ass.equal(-50, l.calculateNow(corNow)); //t.now
     looper.drawPoint(100, 50, corNow);
     ass.deepEqual([-150], l.exportData().times); //birth
     ass.deepEqual([[100, 50]], segmentsAt(l, corNow - 1));
@@ -313,7 +312,7 @@ var reverseCurveAtCreation = function(){
     ass.deepEqual([[120, 80]], segmentsAt(l, corNow - 1));
     looper.completeLine(corNow);
     ass.equal(1800, l.calculateNow(corNow));
-    ass.deepEqual([ 1850, 1800, 1750 ], l.exportData().times); 
+    //ass.deepEqual([ 1850, 1800, 1750 ], l.exportData().times); 
     ass.deepEqual([[120, 80]], segmentsAt(l, corNow - 1));
     // -250    -200    -150    -100    -50     0
     // 1750    1800    1850    1900    1950    2000
@@ -322,6 +321,10 @@ var reverseCurveAtCreation = function(){
     // .------|-------> point 3
     //        ......................... last = 150
     //        . now - 1
+
+
+    ass.deepEqual([[100, 50]], segmentsAt(l, start - 51));
+    ass.deepEqual([[100, 50]], segmentsAt(l, start + 1949));
 };
 
 var reverseCurveAtCreationMultiPeriodDetailed = function(){

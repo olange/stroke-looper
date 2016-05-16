@@ -33,9 +33,8 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration,  
     var shiftTimesIntoPositive = function(times, lineDuration){
         if(times.length < 1){ return; }
         var minTime = Math.min(data.times[0], data.times[data.times.length-1]);
-        var offset = 0;
-        while(minTime + offset < 0){ offset += lineDuration; }
-        if(!offset){ return; }
+        var offset = - lineDuration * Math.floor(minTime / lineDuration);
+        if(offset < 1){ return; }
         data.times.forEach(function(time, i){
             data.times[i] += offset;
         });
