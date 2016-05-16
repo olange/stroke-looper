@@ -331,7 +331,7 @@ var reverseCurveAtCreationMultiPeriodDetailed = function(){
     var now = start;
     looper.setSpeed(-1);
      
-    var times = [1999999999999850, 1999999999999800, 1999999999999750]; 
+    var times = [-150, -200, -250]; 
 
     var corNow = looper.correctedNow(new Date(now));
     ass.equal(-5000, corNow); 
@@ -345,6 +345,7 @@ var reverseCurveAtCreationMultiPeriodDetailed = function(){
     looper.drawPoint(100, 50, corNow);
     ass.deepEqual(times.slice(0,1), l.exportData().times); //birth
     ass.deepEqual([[100, 50]], segmentsAt(l, corNow - 1));
+    // -250    -200    -150    -100    -50     0
     // 1750    1800    1850    1900    1950
     //                 .birth         .birth + lifetime
     //                 .--------------> point 1
@@ -353,10 +354,10 @@ var reverseCurveAtCreationMultiPeriodDetailed = function(){
     corNow = looper.correctedNow(new Date(now+=50));
     ass.equal(-5100, corNow); 
     ass.equal(1900, l.calculateNow(corNow)); //t.now
-    // ass.equal(-100, l.calculateNow(corNow)); //t.now
     looper.drawPoint(110, 60, corNow);
     ass.deepEqual(times.slice(0,2), l.exportData().times); //birth
     ass.deepEqual([[100, 50], [110, 60]], segmentsAt(l, corNow - 1));
+    // -250    -200    -150    -100    -50     0
     // 1750    1800    1850    1900    1950
     //         .birth         .birth + lifetime
     //                 .------|-------> point 1
@@ -369,6 +370,7 @@ var reverseCurveAtCreationMultiPeriodDetailed = function(){
     looper.drawPoint(120, 80, corNow);
     ass.deepEqual(times.slice(0,3), l.exportData().times); //birth
     ass.deepEqual([[110, 60], [120, 80]], segmentsAt(l, corNow - 1));
+    // -250    -200    -150    -100    -50     0
     // 1750    1800    1850    1900    1950
     //                |.--------------> point 1
     //         .------|-------> point 2
@@ -380,8 +382,9 @@ var reverseCurveAtCreationMultiPeriodDetailed = function(){
     ass.equal(1800, l.calculateNow(corNow));
     ass.deepEqual([[120, 80]], segmentsAt(l, corNow - 1));
     looper.completeLine(corNow);
-    ass.deepEqual(times.slice(0,3), l.exportData().times); //birth
+    ass.deepEqual([1850, 1800, 1750], l.exportData().times); //birth
     ass.deepEqual([[120, 80]], segmentsAt(l, corNow - 1));
+    // -250    -200    -150    -100    -50     0
     // 1750    1800    1850    1900    1950    2000
     //        |        .--------------> point 1
     //        |.--------------> point 2

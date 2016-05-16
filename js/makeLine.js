@@ -161,12 +161,6 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration,  
                 .birth      .dateNow
                 ------------>  lifetime */
                 birth -= lifetime;
-                if(data.multiPeriod){
-                    // TODO why do we need this?
-                    // make (almost) sure all times are positive
-                    // see http://stackoverflow.com/questions/307179/what-is-javascripts-highest-integer-value-that-a-number-can-go-to-without-losin
-                    birth += 1000000000000 * intervalDuration;
-                }
             }
             var segment = {point: point};
             data.times.push(birth);
