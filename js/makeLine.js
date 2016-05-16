@@ -135,8 +135,8 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration,  
                 periodsWithData = totalPeriods - emptyPeriods;
             }
             var periodSegments = [];
+            var now  = calculateNow(dateNow);
             for(var i = 0; i < periodsWithData; i++){
-                var now  = calculateNow(dateNow);
                 var timeOffset = (emptyPeriods + i) * intervalDuration || 0;
                 var segs = this.segmentsToShow(now + timeOffset);
                 periodSegments.push(segs); 
