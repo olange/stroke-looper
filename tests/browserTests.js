@@ -311,7 +311,8 @@ var reverseCurveAtCreation = function(){
     ass.equal(-200, l.calculateNow(corNow));
     ass.deepEqual([[120, 80]], segmentsAt(l, corNow - 1));
     looper.completeLine(corNow);
-    ass.equal(1800, l.calculateNow(corNow));
+    ass.equal(-200, l.calculateNow(corNow));
+    //ass.equal(1800, l.calculateNow(corNow));
     //ass.deepEqual([ 1850, 1800, 1750 ], l.exportData().times); 
     ass.deepEqual([[120, 80]], segmentsAt(l, corNow - 1));
     // -250    -200    -150    -100    -50     0
@@ -385,7 +386,8 @@ var reverseCurveAtCreationMultiPeriodDetailed = function(){
     ass.equal(1800, l.calculateNow(corNow));
     ass.deepEqual([[120, 80]], segmentsAt(l, corNow - 1));
     looper.completeLine(corNow);
-    ass.deepEqual([1850, 1800, 1750], l.exportData().times); //birth
+    ass.deepEqual(times, l.exportData().times); //birth
+    //ass.deepEqual([1850, 1800, 1750], l.exportData().times); //birth
     ass.deepEqual([[120, 80]], segmentsAt(l, corNow - 1));
     // -250    -200    -150    -100    -50     0
     // 1750    1800    1850    1900    1950    2000
@@ -394,6 +396,9 @@ var reverseCurveAtCreationMultiPeriodDetailed = function(){
     // .------|-------> point 3
     //        ......................... last = 150
     //        . now - 1
+    
+    ass.deepEqual([[120, 80]], segmentsAt(l, start + 1800 - 1));
+    
 };
 
 var reverseCurveAtCreationMultiPeriod = function(){

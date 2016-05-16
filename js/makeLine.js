@@ -30,16 +30,6 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration,  
         referencePath.smooth({ type: 'catmull-rom'});
     };
 
-    var shiftTimesIntoPositive = function(times, lineDuration){
-        if(times.length < 1){ return; }
-        var minTime = Math.min(data.times[0], data.times[data.times.length-1]);
-        var offset = - lineDuration * Math.floor(minTime / lineDuration);
-        if(offset < 1){ return; }
-        data.times.forEach(function(time, i){
-            data.times[i] += offset;
-        });
-    };
-
     var initDuration = function(endDate){
         // The end time of the line, after the last point is drawn.
         // This is important when there is no interval duration,
@@ -69,8 +59,6 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration,  
             var intvCount =  Math.max(1, Math.ceil(elapsed/intervalDuration));
             data.lineDuration = intvCount * intervalDuration;
         }
-        // TODO why do we need this?
-        shiftTimesIntoPositive(data.times, data.lineDuration);
     };
     
     var calculateNow =  function(dateNow){
@@ -101,7 +89,6 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration,  
         duration = duration || totalElapsedTime + 1;
         // Time since the start of last interval.
 
-        //TODO shouldn't we add lifetime if we're going backwards?
         var elapsed = totalElapsedTime % duration;
         /* elapsed time can be negative when speed < 0
          .start                      .start + duration
@@ -111,7 +98,18 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration,  
                    elapsed <---------. 
          ------------------> now = elapsed + duration
          */
-        return elapsed < 0 ? duration + elapsed : elapsed;
+        elapsed = elapsed < 0 ? duration + elapsed : elapsed;
+
+        // Shift to negative period if line was recorded in reverse
+        //(So we don't to shiftTimesIntoPositive in completeCreation.)
+        var first = Math.min(data.times[0], data.times[data.times.length-1]);
+        if(!data.multiPeriod && data.lineDuration && first){ 
+            // We don't need this for multiperiod,
+            // because periodSegmentsToShow already shifts into the negative
+            // TODO do this in periodSegmentsToShow timeOffset
+            elapsed += duration * Math.floor(first / duration);
+        }
+        return elapsed;
     };
 
     return {
