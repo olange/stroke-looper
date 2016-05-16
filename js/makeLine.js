@@ -46,10 +46,14 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration,  
         // This is important when there is no interval duration,
         // as it keeps the line from restarting immediately.
         var elapsed = endDate - data.start;
-        if(elapsed < 0){
-            // If we're going back in time,
-            // the first point was not drawn at its birth time
-            // but at its death time.
+        /* .start    .endDate
+           ---------->  elapsed */
+        if(elapsed < 0){ 
+            /* We're going back in time. Dates are deaths, not births.
+                 .endDate  .start
+                 <----------  elapsed 
+            -----> lifetime  
+            --------------->  elapsed (corrected) */
             elapsed = Math.abs(elapsed) + data.lifetime;
         }
         
@@ -57,7 +61,7 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration,  
             data.lineDuration = elapsed ;
         }else{
             /*
-             .start    .dateNow
+             .start    .endDate
              ---------->    elapsed
              ......>......> intervalDurations
              .............> lineDuration:
@@ -66,6 +70,7 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration,  
             var intvCount =  Math.max(1, Math.ceil(elapsed/intervalDuration));
             data.lineDuration = intvCount * intervalDuration;
         }
+        // TODO why do we need this?
         shiftTimesIntoPositive(data.times, data.lineDuration);
     };
     
@@ -76,20 +81,28 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration,  
          .start                          .dateNow
          --------------------------------> totalElapsedTime
 
-         if multiPeriod:
          .....>.....>.....>.....>.....> intervalDurations (if multiPeriod) 
-                                       --> elapsed (since last line interval)
-         else:
-         ...........>...........> lineDurations 
-                                 --------> elapsed (since last looper interval)
+                                       --> elapsed (since last looper interval)
+
+         ...........>...........> lineDurations  (if not multiPeriod) 
+                                 --------> elapsed (since last line interval)
+
+         .dateNow                        .start
+         <-------------------------------- totalElapsedTime
+      .....>.....>.....>.....>.....>.....> intervalDurations (if multiPeriod) 
+      ---> elapsed (since last looper interval)
+      ...........>...........> lineDurations 
+      --------> elapsed (since last line interval)
+
+
          */
         var totalElapsedTime = dateNow - data.start;
-        //no intervalDuration counts as no multiperiod...
-        var nomp = data.multiPeriod;
-        var duration = nomp? intervalDuration : data.lineDuration;
+        var duration = data.multiPeriod? intervalDuration : data.lineDuration;
         // There is no data.lineDuration while the line is being drawn.
         duration = duration || totalElapsedTime + 1;
         // Time since the start of last interval.
+
+        //TODO shouldn't we add lifetime if we're going backwards?
         var elapsed = totalElapsedTime % duration;
         /* elapsed time can be negative when speed < 0
          .start                      .start + duration
@@ -111,20 +124,20 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration,  
             });
         },
         periodSegmentsToShow:  function(dateNow){
-            var numberOfPeriods = 1; 
-            var numberOfEmptyPeriods = 0;
+            var periodsWithData = 1; 
+            var emptyPeriods = 0;
             var ts = data.times;
             if(data.multiPeriod && ts.length > 0){
                 var last = Math.max(ts[ts.length-1], ts[0]);
                 var first = Math.min(ts[ts.length-1], ts[0]);
-                var totalNumberOfPeriods = Math.ceil(last / intervalDuration);
-                numberOfEmptyPeriods = Math.floor(first / intervalDuration);
-                numberOfPeriods = totalNumberOfPeriods - numberOfEmptyPeriods;
+                var totalPeriods = Math.ceil(last / intervalDuration);
+                emptyPeriods = Math.floor(first / intervalDuration);
+                periodsWithData = totalPeriods - emptyPeriods;
             }
             var periodSegments = [];
-            for(var i = 0; i < numberOfPeriods; i++){
+            for(var i = 0; i < periodsWithData; i++){
                 var now  = calculateNow(dateNow);
-                var timeOffset = (numberOfEmptyPeriods + i) * intervalDuration || 0;
+                var timeOffset = (emptyPeriods + i) * intervalDuration || 0;
                 var segs = this.segmentsToShow(now + timeOffset);
                 periodSegments.push(segs); 
             }
@@ -144,17 +157,18 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration,  
             var elapsed = dateNow - data.start;
             var birth = elapsed;
             if(elapsed < 0){
-                // If we're going backwards in time, 
-                // the segment is considered to be pushed
-                // at the end of its lifetime.
+                /* Going backwards, segments appear at death time.
+                .birth      .dateNow
+                ------------>  lifetime */
                 birth -= lifetime;
-                // make (almost) sure all times are positive
                 if(data.multiPeriod){
-                    birth += 10000000000000 * intervalDuration;
+                    // TODO why do we need this?
+                    // make (almost) sure all times are positive
+                    // see http://stackoverflow.com/questions/307179/what-is-javascripts-highest-integer-value-that-a-number-can-go-to-without-losin
+                    birth += 1000000000000 * intervalDuration;
                 }
             }
             var segment = {point: point};
-            //console.log('push', now);
             data.times.push(birth);
             referencePath.add(segment);
             var previousIndex = referencePath.segments.length - 2;

@@ -17,7 +17,8 @@
 
          var urlParams = urlUtils.getUrlParams();
          var durationInSeconds = parseFloat(urlParams.duration);
-         looper.setup('myCanvas', durationInSeconds * 1000, true);
+         var multiPeriod = urlParams.multi === 'true'; 
+         looper.setup('myCanvas', durationInSeconds * 1000, multiPeriod);
          looper.start();
          if(urlParams.gist){
              io.gists.load(urlParams.gist, looper.importData);
