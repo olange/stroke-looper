@@ -60,8 +60,18 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration,  
             data.lineDuration = intvCount * intervalDuration;
         }
     };
-    
-    var calculateNow =  function(dateNow){
+   
+    var calculateDuration = function(totalElapsedTime){
+        if(data.multiPeriod){
+            return intervalDuration;
+        } else if (data.lineDuration){
+            return data.lineDuration;
+        }else{ // the line is being drawn right now
+            return totalElapsedTime + 1;
+        }
+    };
+
+    var calculateTime =  function(dateNow){
         /*
          Calculates the time since the beginning of the current interval.
 
@@ -81,14 +91,10 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration,  
       ...........>...........> lineDurations 
       --------> elapsed (since last line interval)
 
-
          */
         var totalElapsedTime = dateNow - data.start;
-        var duration = data.multiPeriod? intervalDuration : data.lineDuration;
-        // There is no data.lineDuration while the line is being drawn.
-        duration = duration || totalElapsedTime + 1;
+        var duration = calculateDuration(totalElapsedTime);
         // Time since the start of last interval.
-
         var elapsed = totalElapsedTime % duration;
         /* elapsed time can be negative when speed < 0
          .start                      .start + duration
@@ -99,21 +105,11 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration,  
          ------------------> now = elapsed + duration
          */
         elapsed = elapsed < 0 ? duration + elapsed : elapsed;
-
-        // Shift to negative period if line was recorded in reverse
-        //(So we don't to shiftTimesIntoPositive in completeCreation.)
-        var first = Math.min(data.times[0], data.times[data.times.length-1]);
-        if(!data.multiPeriod && data.lineDuration && first){ 
-            // We don't need this for multiperiod,
-            // because periodSegmentsToShow already shifts into the negative
-            // TODO do this in periodSegmentsToShow timeOffset
-            elapsed += duration * Math.floor(first / duration);
-        }
-        return elapsed;
+        return {now: elapsed, duration: duration};
     };
 
     return {
-        calculateNow: calculateNow ,
+        calculateTime: calculateTime ,
         segmentsToShow:  function(now){
             return referencePath.segments.filter(function(s, i){
                 var birth = data.times[i];
@@ -122,20 +118,24 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration,  
         },
         periodSegmentsToShow:  function(dateNow){
             var periodsWithData = 1; 
-            var emptyPeriods = 0;
             var ts = data.times;
-            if(data.multiPeriod && ts.length > 0){
+            var t  = calculateTime(dateNow);
+            var first = ts.length > 0 ? Math.min(ts[ts.length-1], ts[0]) : 0;
+            var emptyPeriods = 0;
+            if(data.multiPeriod || data.lineDuration){
+                // Ignore periods without points,
+                // shift to negative period if line was recorded in reverse.
+                emptyPeriods = Math.floor(first / t.duration);
+            }
+            if(data.multiPeriod && ts.length > 0 ){
                 var last = Math.max(ts[ts.length-1], ts[0]);
-                var first = Math.min(ts[ts.length-1], ts[0]);
-                var totalPeriods = Math.ceil(last / intervalDuration);
-                emptyPeriods = Math.floor(first / intervalDuration);
+                var totalPeriods = Math.ceil(last / t.duration);
                 periodsWithData = totalPeriods - emptyPeriods;
             }
             var periodSegments = [];
-            var now  = calculateNow(dateNow);
             for(var i = 0; i < periodsWithData; i++){
-                var timeOffset = (emptyPeriods + i) * intervalDuration || 0;
-                var segs = this.segmentsToShow(now + timeOffset);
+                var timeOffset = (emptyPeriods + i) * t.duration || 0;
+                var segs = this.segmentsToShow(t.now + timeOffset);
                 periodSegments.push(segs); 
             }
             return periodSegments;
