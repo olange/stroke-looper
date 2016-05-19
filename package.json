@@ -1,15 +1,18 @@
 {
     "name": "stroke-looper",
-    "version": "0.0.1",
+    "productName": "Stroke Looper",
+    "version": "0.1.0",
     "main": "main.js",
     "directories": {
       "test": "tests"
     },
     "scripts": {
         "test": "test",
-        "electron": "electron ."
+        "electron": "electron .",
+        "packager": "electron-packager . --all --out=dist/ --ignore=dist/*"
     },
-    "devDependencies" : {
+    "devDependencies": {
+        "electron-packager": "^7.0.2",
         "electron-prebuilt": "^1.1.0",
         "webdriverio": "^3.4.0",
         "selenium-standalone": "5.1.0"
