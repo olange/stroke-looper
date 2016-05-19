@@ -1,13 +1,12 @@
 var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration,  multiPeriod){
     var data = {start: start,
-                lineDuration: 0,
+                end: null,
                 lifetime: lifetime || 500,
                 color: color || 'black',
                 // multiPeriod requires a defined intervalDuration
                 multiPeriod: intervalDuration && multiPeriod ,
                 strokeWidth: strokeWidth || 2,
                 times: []},
-//        drawingPath = makePath(data),
         drawingPaths = [],
         referencePath = new Path({visible: false});
 
@@ -30,42 +29,40 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration,  
         referencePath.smooth({ type: 'catmull-rom'});
     };
 
-    var initDuration = function(endDate){
+    var setEnd = function(endDate){
         // The end time of the line, after the last point is drawn.
         // This is important when there is no interval duration,
         // as it keeps the line from restarting immediately.
-        var elapsed = endDate - data.start;
         /* .start    .endDate
            ---------->  elapsed */
-        if(elapsed < 0){ 
-            /* We're going back in time. Dates are deaths, not births.
-                 .endDate  .start
-                 <----------  elapsed 
-            -----> lifetime  
-            --------------->  elapsed (corrected) */
-            elapsed = Math.abs(elapsed) + data.lifetime;
-        }
-        
-        if(!intervalDuration){
-            data.lineDuration = elapsed ;
-        }else{
-            /*
-             .start    .endDate
-             ---------->    elapsed
-             ......>......> intervalDurations
-             .............> lineDuration:
-                 lowest multiple of intervalDuration greater than elapsed
-             */
-            var intvCount =  Math.max(1, Math.ceil(elapsed/intervalDuration));
-            data.lineDuration = intvCount * intervalDuration;
-        }
+        var elapsed = endDate - data.start;
+        /* If we're going back in time, Dates are deaths, not births.
+              .endDate  .start
+              <----------  elapsed 
+         -----> lifetime  
+         --------------->  elapsed (corrected) */
+        elapsed = elapsed < 0 ? elapsed - data.lifetime : elapsed;
+        data.end = elapsed;
     };
    
     var calculateDuration = function(totalElapsedTime){
+        //TODO multiPeriod becomes a number
+        //1: intervalDuration, 2: 2*intervalDuration
+        //what number for smallest duration without repetition and:
+        // - is a multiple of intervalDuration (automatic?)
+        // - lasts exactly as long as the curve and restarts (no interval) 
         if(data.multiPeriod){
-            return intervalDuration;
-        } else if (data.lineDuration){
-            return data.lineDuration;
+            return intervalDuration * data.multiPeriod;
+        } else if (data.end && intervalDuration){
+            /* ---------->    end 
+               ......>......> intervalDurations
+               .............> line duration:
+                 lowest multiple of intervalDuration greater than end 
+             */
+            var intvCount =  Math.ceil(Math.abs(data.end)/intervalDuration);
+            return Math.max(1, intvCount) * intervalDuration;
+        } else if (data.end && !intervalDuration){
+            return Math.abs(data.end);
         }else{ // the line is being drawn right now
             return totalElapsedTime + 1;
         }
@@ -81,14 +78,14 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration,  
          .....>.....>.....>.....>.....> intervalDurations (if multiPeriod) 
                                        --> elapsed (since last looper interval)
 
-         ...........>...........> lineDurations  (if not multiPeriod) 
+         ...........>...........> line duration  (if not multiPeriod) 
                                  --------> elapsed (since last line interval)
 
          .dateNow                        .start
          <-------------------------------- totalElapsedTime
       .....>.....>.....>.....>.....>.....> intervalDurations (if multiPeriod) 
       ---> elapsed (since last looper interval)
-      ...........>...........> lineDurations 
+      ...........>...........> line durations 
       --------> elapsed (since last line interval)
 
          */
@@ -122,9 +119,8 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration,  
             var t  = calculateTime(dateNow);
             var first = ts.length > 0 ? Math.min(ts[ts.length-1], ts[0]) : 0;
             var emptyPeriods = 0;
-            if(data.multiPeriod || data.lineDuration){
-                // Ignore periods without points,
-                // shift to negative period if line was recorded in reverse.
+            if(data.multiPeriod || data.end){
+                // Shift to negative period if line was recorded in reverse.
                 emptyPeriods = Math.floor(first / t.duration);
             }
             if(data.multiPeriod && ts.length > 0 ){
@@ -151,9 +147,8 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration,  
             });
         },
         pushSegment: function(point, dateNow){
-            var elapsed = dateNow - data.start;
-            var birth = elapsed;
-            if(elapsed < 0){
+            var birth = dateNow - data.start;
+            if(birth < 0){
                 /* Going backwards, segments appear at death time.
                 .birth      .dateNow
                 ------------>  lifetime */
@@ -166,7 +161,7 @@ var makeLine = function(color, strokeWidth, lifetime, start, intervalDuration,  
             referencePath.segments[Math.max(0, previousIndex)].smooth();
         },
         completeCreation: function(absoluteLast){
-            initDuration(absoluteLast);
+            setEnd(absoluteLast);
             if(referencePath.segments.length>1){
                 referencePath.smooth({ type: 'catmull-rom'});
             }

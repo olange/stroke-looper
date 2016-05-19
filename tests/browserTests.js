@@ -48,7 +48,6 @@ var normalCurve = function(){
     looper.completeLine(looper.correctedNow(new Date(ms+=50)));
     var data = l.exportData();        
     ass.deepEqual([50, 100, 150], data.times);
-    ass.equal(2000, data.lineDuration);
 
     ass.deepEqual([], segmentsAt(l, start + 49));
     ass.deepEqual([[100, 50]], segmentsAt(l, start + 50));
@@ -208,7 +207,7 @@ var curveAtCreation = function(){
 
 var curveAtCreationMultiPeriod = function(){
     var incr = 800;
-    var multiPeriod = true;
+    var multiPeriod = 1;
     setupLooper(2*incr, multiPeriod);
     var start = 1460480954631;
     var now = start;
@@ -402,7 +401,7 @@ var reverseCurveAtCreationMultiPeriodDetailed = function(){
 
 var reverseCurveAtCreationMultiPeriod = function(){
     var lifetime = 100;
-    var multiPeriod = true;
+    var multiPeriod = 1;
     setupLooper(lifetime, multiPeriod);
     var start = 5000;
     var now = start;
